@@ -67,6 +67,22 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
+## 認証（Supabase Auth / メール+パスワード）
+
+フロントエンド（PC・スマホ）からは以下を使ってください。
+
+用途 | import
+---|---
+ログイン / 登録 / ログアウト（`useActionState` 対応） | `signIn` / `signUp` / `signOut` from `@/features/auth/actions`
+フォーム状態の型 | `AuthFormState` from `@/features/auth/types`
+Server Component でユーザー取得 | `getCurrentUser` / `requireUser` from `@/features/auth/dal`
+Client Component から Supabase | `createClient` from `@/lib/supabase/client`
+
+- `/dashboard` `/collection` `/ranking` `/scan` `/bookshelf` は未ログインだと `/login?next=...` へリダイレクト（`src/proxy.ts`）
+- フォームの name 属性: `email` / `password` / `displayName`（登録のみ）/ `next`（ログインのみ・hidden）
+- `src/features/auth/components/` のフォームは動作確認用の仮実装なので、各端末向けに差し替えてOK
+- DB: `supabase/migrations/` の SQL を Supabase の SQL Editor で実行する
+
 ## Scripts
 
 ```bash
