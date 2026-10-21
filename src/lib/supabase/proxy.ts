@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import type { Database } from "@/types/database";
+
 import { getSupabaseEnv } from "./env";
 
 // アクセストークンを必要に応じてリフレッシュし、Cookie に書き戻す
@@ -8,7 +10,7 @@ export async function updateSession(request: NextRequest) {
   const { url, anonKey } = getSupabaseEnv();
   let response = NextResponse.next({ request });
 
-  const supabase = createServerClient(url, anonKey, {
+  const supabase = createServerClient<Database>(url, anonKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
