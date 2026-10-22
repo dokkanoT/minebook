@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Zap, ZapOff, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ChevronRight, Zap, ZapOff, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface ScannedItem {
   id: string;
@@ -13,11 +13,11 @@ interface ScannedItem {
 }
 
 interface ScanScreenProps {
-  onBack: () => void;
+  onBack?: () => void;
   onOpenEvaluation?: (item: ScannedItem) => void;
 }
 
-export const ScanScreen = ({ onBack, onOpenEvaluation }: ScanScreenProps) => {
+export const ScanScreen = ({ onOpenEvaluation }: ScanScreenProps) => {
   const [flashOn, setFlashOn] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
 

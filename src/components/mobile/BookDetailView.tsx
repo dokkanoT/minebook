@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { BookOpen, Sparkles, CheckCircle2, Bookmark, ShoppingCart, Clock, Ban, Star, Quote, PenLine } from 'lucide-react';
+import { BookOpen, Sparkles, CheckCircle2, Bookmark, ShoppingCart, Star, Quote, PenLine } from 'lucide-react';
 import type { BookItem, FlagType } from './MobileScreen';
 
 interface BookDetailViewProps {

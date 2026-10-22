@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { BookOpen, Home as HomeIcon, ScanLine, X, Sparkles, TrendingDown, ChevronUp, ChevronDown, CheckCircle2, Bookmark, PlusCircle, Scan, ChevronRight, Flag, ShoppingCart, Clock, Ban, Star, Quote, PenLine } from 'lucide-react';
+import { BookOpen, Home as HomeIcon, ScanLine, X, Sparkles, ChevronUp, ChevronDown, CheckCircle2, Bookmark, ChevronRight, Flag, ShoppingCart, Clock, Ban, Star, Quote, PenLine } from 'lucide-react';
 import { ScanScreen } from './ScanScreen';
 
 type SheetState = 'closed' | 'half' | 'full';
@@ -150,7 +150,7 @@ const INITIAL_BOOKS: BookItem[] = [
 
 export function MobileScreen() {
   const [currentTab, setCurrentTab] = useState<TabType>('home');
-  const [viewMode, setViewMode] = useState<'empty' | 'single' | 'multiple'>('multiple');
+  const [viewMode] = useState<'empty' | 'single' | 'multiple'>('multiple');
 
   const [books, setBooks] = useState<BookItem[]>(INITIAL_BOOKS);
   const [sheetState, setSheetState] = useState<SheetState>('closed');
