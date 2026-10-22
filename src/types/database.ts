@@ -17,36 +17,71 @@ export type Database = {
       books: {
         Row: {
           author: string | null
+          category: string | null
           cover_url: string | null
           created_at: string
           description: string | null
           isbn: string
           list_price: number | null
           publisher: string | null
+          rakuten_genre_id: string | null
           title: string
           updated_at: string
         }
         Insert: {
           author?: string | null
+          category?: string | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
           isbn: string
           list_price?: number | null
           publisher?: string | null
+          rakuten_genre_id?: string | null
           title: string
           updated_at?: string
         }
         Update: {
           author?: string | null
+          category?: string | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
           isbn?: string
           list_price?: number | null
           publisher?: string | null
+          rakuten_genre_id?: string | null
           title?: string
           updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "books_category_fkey"
+            columns: ["category"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          created_at: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Update: {
+          created_at?: string
+          name?: string
+          slug?: string
+          sort_order?: number
         }
         Relationships: []
       }

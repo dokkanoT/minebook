@@ -60,13 +60,10 @@ pnpm install
 pnpm dev
 ```
 
-環境変数は `.env.local` を作成してください。
+環境変数は `.env.example` をコピーして `.env.local` を作り、値を入れてください（各キーの説明は `.env.example` 内）。
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-# サーバー専用（books の登録に使用）。NEXT_PUBLIC_ を付けないこと
-SUPABASE_SECRET_KEY=
+```bash
+cp .env.example .env.local
 ```
 
 ## 認証（Supabase Auth / メール+パスワード）
@@ -88,6 +85,7 @@ Client Component から Supabase | `createClient` from `@/lib/supabase/client`
 
 - スキャン画面からは `lookupBook(isbn)` from `@/features/books/actions` を呼ぶ（ISBN-10 / 13・ハイフンありどちらでも可）
 - 初めての本はサーバーが openBD から取得して `books` に登録する。`books` はクライアントから書き込めない
+- カテゴリーは楽天ブックスのジャンルから自動判定（`books.category` → `categories.slug`）。判定できない本は `null`（未分類）
 
 ## データベース（Supabase CLI）
 
@@ -122,6 +120,8 @@ src/
 ```
 
 ## ドキュメント
+
+- [src/app/README.md](src/app/README.md) — 画面（app ディレクトリ）の仕様・担当・書き方
 
 - docs/requirements.md
 - docs/database.md
