@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { BookOpen, Sparkles, CheckCircle2, Bookmark, ShoppingCart, Star, Quote, PenLine } from 'lucide-react';
-import type { BookItem, FlagType } from './MobileScreen';
+import type { BookItem, FlagType } from './types';
 
 interface BookDetailViewProps {
   isbn?: string;
