@@ -60,10 +60,20 @@ pnpm install
 pnpm dev
 ```
 
-環境変数は `.env.example` をコピーして `.env.local` を作り、値を入れてください（各キーの説明は `.env.example` 内）。
+環境変数は `.env.local` を作成してください。
 
-```bash
-cp .env.example .env.local
+```env
+# Supabase（必須）: ダッシュボード → Connect または Project Settings → API Keys
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+# サーバー専用（books の登録に使用）。NEXT_PUBLIC_ を付けないこと
+SUPABASE_SECRET_KEY=
+
+# 楽天ブックス API（任意）。未設定でも動くが、カテゴリーは未分類になる
+RAKUTEN_APPLICATION_ID=
+RAKUTEN_ACCESS_KEY=
+# 楽天のアプリ設定に登録した Web サイト URL
+RAKUTEN_REFERER=
 ```
 
 ## 認証（Supabase Auth / メール+パスワード）
