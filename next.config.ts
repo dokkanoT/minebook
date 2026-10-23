@@ -5,8 +5,14 @@ const nextConfig: NextConfig = {
   experimental: {
     agentFeedback: true,
   },
-  cacheComponents: true,
-  partialPrefetching: true,
+  // Allow local network devices (smartphones) to connect in development
+  allowedDevOrigins: [
+    '172.24.44.126',
+    '172.24.44.126:3000',
+    '10.0.0.15',
+    '10.0.0.15:3000',
+    'localhost:3000',
+  ],
   turbopack: {
     rules: {
       "*.css": {
