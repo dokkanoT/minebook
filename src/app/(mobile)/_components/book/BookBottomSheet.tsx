@@ -9,15 +9,13 @@ import {
   ChevronDown,
   CheckCircle2,
   Bookmark,
-  Flag,
   ShoppingCart,
-  Clock,
-  Ban,
-  Star,
-  Quote,
   PenLine,
 } from 'lucide-react';
 import type { BookItem, FlagType, SheetState } from '../../_data/types';
+import { PriceInputSection } from './PriceInputSection';
+import { FlagDropdown } from './FlagDropdown';
+import { ReviewCard } from './ReviewCard';
 
 interface BookBottomSheetProps {
   sheetState: SheetState;
@@ -36,7 +34,6 @@ export function BookBottomSheet({
   onEvaluate,
   onSetFlag,
 }: BookBottomSheetProps) {
-  const [isFlagMenuOpen, setIsFlagMenuOpen] = useState(false);
   const [isInputtingPrice, setIsInputtingPrice] = useState(false);
   const [priceInputValue, setPriceInputValue] = useState('');
   const [justEvaluated, setJustEvaluated] = useState(false);
@@ -88,20 +85,12 @@ export function BookBottomSheet({
     }, 3000);
   };
 
-  const handleSelectFlag = (flag: FlagType) => {
-    onSetFlag(flag);
-    setIsFlagMenuOpen(false);
-  };
-
   return (
     <>
       {/* 背景オーバーレイ */}
       {sheetState !== 'closed' && (
         <div
-          onClick={() => {
-            onClose();
-            setIsFlagMenuOpen(false);
-          }}
+          onClick={onClose}
           className="absolute inset-0 bg-black/40 z-40 transition-opacity duration-300 ease-out cursor-pointer"
         />
       )}
@@ -133,96 +122,11 @@ export function BookBottomSheet({
           <h2 className="text-base font-bold text-gray-900 tracking-tight">本詳細</h2>
 
           <div className="flex items-center gap-1.5">
-            {/* フラグボタン */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setIsFlagMenuOpen(!isFlagMenuOpen)}
-                className={`p-2 rounded-full transition-all active:scale-90 ${
-                  selectedBook?.flag === 'purchased'
-                    ? 'text-emerald-700 bg-emerald-50'
-                    : selectedBook?.flag === 'pending'
-                    ? 'text-amber-700 bg-amber-50'
-                    : selectedBook?.flag === 'skip'
-                    ? 'text-gray-700 bg-gray-100'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                }`}
-                title="フラグを設定"
-              >
-                <Flag
-                  className={`w-5 h-5 ${
-                    selectedBook?.flag && selectedBook.flag !== 'none'
-                      ? 'fill-current'
-                      : ''
-                  }`}
-                />
-              </button>
-
-              {isFlagMenuOpen && (
-                <div
-                  className="fixed inset-0 z-20 cursor-default"
-                  onClick={() => setIsFlagMenuOpen(false)}
-                />
-              )}
-
-              {/* フラグメニュー */}
-              <div
-                className={`absolute right-0 top-11 bg-white border border-gray-200 rounded-2xl shadow-xl p-1.5 w-44 z-30 transition-all duration-200 origin-top-right ${
-                  isFlagMenuOpen
-                    ? 'opacity-100 scale-100 pointer-events-auto'
-                    : 'opacity-0 scale-95 pointer-events-none'
-                }`}
-              >
-                <p className="text-[10px] text-gray-400 font-bold px-3 py-1 uppercase tracking-wider">
-                  ステータス選択
-                </p>
-                <button
-                  type="button"
-                  onClick={() => handleSelectFlag('purchased')}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2.5 transition-colors active:bg-gray-150 ${
-                    selectedBook?.flag === 'purchased'
-                      ? 'bg-emerald-50 text-emerald-800 font-bold'
-                      : 'text-gray-800 hover:bg-gray-100/70'
-                  }`}
-                >
-                  <ShoppingCart className="w-4 h-4 text-emerald-600" />
-                  <span>購入（レジへ）</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectFlag('pending')}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2.5 transition-colors active:bg-gray-150 ${
-                    selectedBook?.flag === 'pending'
-                      ? 'bg-amber-50 text-amber-800 font-bold'
-                      : 'text-gray-800 hover:bg-gray-100/70'
-                  }`}
-                >
-                  <Clock className="w-4 h-4 text-amber-600" />
-                  <span>保留（棚に戻した）</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectFlag('skip')}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2.5 transition-colors active:bg-gray-150 ${
-                    selectedBook?.flag === 'skip'
-                      ? 'bg-gray-100 text-gray-900 font-bold'
-                      : 'text-gray-800 hover:bg-gray-100/70'
-                  }`}
-                >
-                  <Ban className="w-4 h-4 text-gray-500" />
-                  <span>見送り（今回はパス）</span>
-                </button>
-                {selectedBook?.flag && selectedBook.flag !== 'none' && (
-                  <button
-                    type="button"
-                    onClick={() => handleSelectFlag('none')}
-                    className="w-full text-left px-3 py-1.5 rounded-xl text-[11px] text-gray-400 hover:text-gray-600 hover:bg-gray-100/50 transition-colors border-t border-gray-100 mt-1"
-                  >
-                    フラグを解除
-                  </button>
-                )}
-              </div>
-            </div>
+            {/* フラグメニュー */}
+            <FlagDropdown
+              currentFlag={selectedBook?.flag}
+              onSelectFlag={onSetFlag}
+            />
 
             {/* 展開/縮小ボタン */}
             <button
@@ -243,10 +147,7 @@ export function BookBottomSheet({
             {/* 閉じるボタン */}
             <button
               type="button"
-              onClick={() => {
-                onClose();
-                setIsFlagMenuOpen(false);
-              }}
+              onClick={onClose}
               className="p-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors active:scale-95"
               title="閉じる"
             >
@@ -363,35 +264,12 @@ export function BookBottomSheet({
               </div>
 
               {/* ネットの評判カード */}
-              {selectedBook.reviewRating && (
-                <div className="mt-4 bg-[#FEF8EF] rounded-2xl p-4">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-bold text-gray-900">ネットの評判</h4>
-                    <div className="flex items-center gap-1.5">
-                      <Star className="w-4 h-4 text-amber-500 fill-none stroke-[2]" />
-                      <span className="text-base font-black text-gray-900">
-                        {selectedBook.reviewRating.toFixed(1)}
-                      </span>
-                      <span className="text-xs text-gray-400 font-normal">
-                        ({selectedBook.reviewCount?.toLocaleString()}件)
-                      </span>
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-[#9A6218] font-medium mt-1">
-                    {selectedBook.reviewSource || 'Amazon / 読書メーター'}
-                  </p>
-
-                  {selectedBook.reviewSnippet && (
-                    <div className="mt-3 bg-white rounded-xl p-3 shadow-2xs flex items-start gap-2.5">
-                      <Quote className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                      <p className="text-xs text-gray-800 leading-relaxed font-normal">
-                        {selectedBook.reviewSnippet}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
+              <ReviewCard
+                rating={selectedBook.reviewRating}
+                count={selectedBook.reviewCount}
+                source={selectedBook.reviewSource}
+                snippet={selectedBook.reviewSnippet}
+              />
 
               {/* 全画面表示時に展開される詳細 */}
               <div
@@ -444,144 +322,13 @@ export function BookBottomSheet({
             {/* 下部固定エリア（価格入力 ⇔ ボタン切り替え） */}
             <div className="px-5 pt-2.5 pb-2 bg-white border-t border-gray-100 shrink-0">
               {isInputtingPrice ? (
-                <div className="space-y-2.5 animate-slide-down">
-                  {/* タイトル & キャンセル */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
-                      <PenLine className="w-3.5 h-3.5 text-[#9E6219]" />
-                      古本屋の店頭価格（税込）
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setIsInputtingPrice(false)}
-                      className="text-xs text-gray-400 hover:text-gray-700 font-medium px-1.5 py-0.5 cursor-pointer"
-                    >
-                      キャンセル
-                    </button>
-                  </div>
-
-                  {/* クイック選択チップ */}
-                  <div>
-                    <div className="flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none]">
-                      {[
-                        { label: '¥110', val: 110 },
-                        { label: '¥220', val: 220 },
-                        { label: '¥330', val: 330 },
-                        { label: '¥440', val: 440 },
-                        { label: '¥550', val: 550 },
-                        {
-                          label: `半額 ¥${Math.round(
-                            selectedBook.originalPrice / 2,
-                          ).toLocaleString()}`,
-                          val: Math.round(selectedBook.originalPrice / 2),
-                        },
-                      ].map((item) => (
-                        <button
-                          key={item.label}
-                          type="button"
-                          onClick={() => setPriceInputValue(String(item.val))}
-                          className={`px-2.5 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-all active:scale-95 border cursor-pointer ${
-                            priceInputValue === String(item.val)
-                              ? 'bg-[#9E6219] text-white border-[#9E6219] shadow-xs'
-                              : 'bg-[#FEF8F0] hover:bg-amber-100/70 text-[#9E6219] border-amber-200/80'
-                          }`}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 金額入力 ＋ 判定ボタン */}
-                  <div className="flex gap-2 items-center">
-                    <div className="relative flex-1">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">
-                        ¥
-                      </span>
-                      <input
-                        type="number"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        value={priceInputValue}
-                        onChange={(e) => setPriceInputValue(e.target.value)}
-                        placeholder="金額を入力"
-                        autoFocus
-                        className="w-full bg-gray-50 border-2 border-gray-250 focus:border-[#9E6219] focus:bg-white rounded-xl py-2 pl-7 pr-7 text-base font-bold text-gray-900 outline-none transition-all"
-                      />
-                      {priceInputValue && (
-                        <button
-                          type="button"
-                          onClick={() => setPriceInputValue('')}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 text-[10px] flex items-center justify-center cursor-pointer"
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const num = parseInt(priceInputValue, 10);
-                        if (!isNaN(num) && num >= 0) {
-                          handleExecuteEvaluation(num);
-                        }
-                      }}
-                      disabled={
-                        !priceInputValue || isNaN(parseInt(priceInputValue, 10))
-                      }
-                      className="px-5 py-2.5 bg-[#9E6219] disabled:bg-gray-200 disabled:text-gray-400 hover:bg-[#8A5414] active:scale-95 text-white font-bold text-sm rounded-xl shadow-xs transition-all shrink-0 flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      判定する！
-                    </button>
-                  </div>
-
-                  {/* リアルタイムお宝度プレビュー */}
-                  {priceInputValue && !isNaN(parseInt(priceInputValue, 10)) && (
-                    <div className="text-center text-xs font-bold py-1.5 px-2 rounded-lg bg-[#FEF8F0] text-[#9E6219] border border-amber-200/80 flex items-center justify-center gap-2">
-                      {parseInt(priceInputValue, 10) < selectedBook.originalPrice ? (
-                        <>
-                          <span>
-                            {Math.round(
-                              (1 -
-                                parseInt(priceInputValue, 10) /
-                                  selectedBook.originalPrice) *
-                                100,
-                            )}
-                            % OFF
-                          </span>
-                          <span>・</span>
-                          <span>
-                            お得額: +¥
-                            {(
-                              selectedBook.originalPrice - parseInt(priceInputValue, 10)
-                            ).toLocaleString()}
-                          </span>
-                          <span
-                            className={`text-[10px] text-white px-1.5 py-0.2 rounded font-black ${
-                              (selectedBook.originalPrice -
-                                parseInt(priceInputValue, 10)) /
-                                selectedBook.originalPrice >=
-                              0.75
-                                ? 'bg-amber-500'
-                                : 'bg-indigo-500'
-                            }`}
-                          >
-                            {(selectedBook.originalPrice -
-                              parseInt(priceInputValue, 10)) /
-                              selectedBook.originalPrice >=
-                            0.75
-                              ? 'RANK S'
-                              : 'RANK A'}
-                          </span>
-                        </>
-                      ) : (
-                        <span>定価以上（プレミア価格）</span>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <PriceInputSection
+                  originalPrice={selectedBook.originalPrice}
+                  value={priceInputValue}
+                  onChange={setPriceInputValue}
+                  onCancel={() => setIsInputtingPrice(false)}
+                  onEvaluate={handleExecuteEvaluation}
+                />
               ) : (
                 <div>
                   {selectedBook.isEvaluated ? (
@@ -590,7 +337,7 @@ export function BookBottomSheet({
                         <button
                           type="button"
                           onClick={() => {
-                            handleSelectFlag('purchased');
+                            onSetFlag('purchased');
                             onClose();
                           }}
                           className="flex-1 py-3 bg-neutral-900 hover:bg-neutral-800 active:scale-[0.99] text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"

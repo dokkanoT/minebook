@@ -9,7 +9,7 @@ export default function MobileScanPage() {
 
   return (
     <ScanScreen
-      onBack={() => router.push('/')}
+      onBack={() => router.push('/home')}
       onOpenEvaluation={() => router.push('/books/9784560027783')}
     />
   );

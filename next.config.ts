@@ -5,7 +5,9 @@ const nextConfig: NextConfig = {
   experimental: {
     agentFeedback: true,
   },
-  // Allow local network devices (smartphones) to connect in development
+  cacheComponents: true,
+  partialPrefetching: true,
+  // 開発時のスマホ実機確認用（各メンバーのローカルIP）
   allowedDevOrigins: [
     '172.24.44.126',
     '172.24.44.126:3000',
