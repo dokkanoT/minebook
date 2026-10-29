@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import type { BookItem, FlagType, SheetState, TabType } from './types';
-import { INITIAL_BOOKS } from './mockData';
-import { ScanScreen } from './ScanScreen';
-import { HomeView } from './HomeView';
-import { BottomNav } from './BottomNav';
-import { BookBottomSheet } from './BookBottomSheet';
+import type { BookItem, FlagType, SheetState, TabType } from '../_data/types';
+import { INITIAL_BOOKS } from '../_data/mockData';
+import { ScanScreen } from './scan/ScanScreen';
+import { HomeView } from './home/HomeView';
+import { BottomNav } from './layout/BottomNav';
+import { BookBottomSheet } from './book/BookBottomSheet';
 
 // 型を外部から import しているファイル（BookDetailView など）との互換性を維持
 export type { BookItem, FlagType, SheetState, TabType };

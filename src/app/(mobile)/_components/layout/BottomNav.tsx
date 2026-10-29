@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Home as HomeIcon, ScanLine } from 'lucide-react';
-import type { TabType } from './types';
+import type { TabType } from '../../_data/types';
 
 interface BottomNavProps {
   currentTab: TabType;

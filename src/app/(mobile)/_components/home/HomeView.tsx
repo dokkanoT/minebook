@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { BookOpen, ChevronRight, Clock, ShoppingCart, Ban } from 'lucide-react';
-import type { BookItem, FlagType } from './types';
+import type { BookItem, FlagType } from '../../_data/types';
 
 interface HomeViewProps {
   books: BookItem[];

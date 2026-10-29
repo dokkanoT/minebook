@@ -17,7 +17,7 @@ import {
   Quote,
   PenLine,
 } from 'lucide-react';
-import type { BookItem, FlagType, SheetState } from './types';
+import type { BookItem, FlagType, SheetState } from '../../_data/types';
 
 interface BookBottomSheetProps {
   sheetState: SheetState;

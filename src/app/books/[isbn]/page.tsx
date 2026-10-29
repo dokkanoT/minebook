@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
-import { BookDetailView } from '@/components/mobile/BookDetailView';
+import { BookDetailView } from '@/app/(mobile)/_components/book/BookDetailView';
 
 interface BookPageProps {
   params: Promise<{ isbn: string }>;
