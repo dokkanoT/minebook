@@ -1,4 +1,4 @@
-// src/app/(dashboard)/_components/analysis/TagUsagePanel.tsx
+// src/app/(dashboard)/dashboard/_components/analysis/TagUsagePanel.tsx
 import { ArrowLink } from "../ui/ArrowLink";
 import { Badge } from "../ui/Badge";
 import { BarTrack } from "../ui/BarTrack";
@@ -34,7 +34,7 @@ export function TagUsagePanel({ tags, registeredCount }: TagUsagePanelProps) {
         ))}
       </ul>
       <div className="mt-auto pt-6">
-        <ArrowLink href="/collection">コレクションでタグを管理</ArrowLink>
+        <ArrowLink href="/dashboard/collection">コレクションでタグを管理</ArrowLink>
       </div>
     </Panel>
   );

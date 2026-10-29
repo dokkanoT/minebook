@@ -12,10 +12,12 @@ URL | ファイル | 端末 | ログイン | 担当
 `/login` | `(auth)/login/page.tsx` | 両方 | 不要（ログイン済みは `/` へ） | 未定
 `/register` | `(auth)/register/page.tsx` | 両方 | 不要（ログイン済みは `/` へ） | 未定
 `/dashboard` | `(dashboard)/dashboard/page.tsx` | PC | 必要 | PC
-`/collection` | `(dashboard)/collection/page.tsx` | PC | 必要 | PC
-`/ranking` | `(dashboard)/ranking/page.tsx` | PC | 必要 | PC
+`/dashboard/collection` | `(dashboard)/dashboard/collection/page.tsx` | PC | 必要 | PC
+`/dashboard/ranking` | `(dashboard)/dashboard/ranking/page.tsx` | PC | 必要 | PC
+`/dashboard/bookshelf` | `(dashboard)/dashboard/bookshelf/page.tsx` | PC | 必要 | PC
+`/dashboard/history` | `(dashboard)/dashboard/history/page.tsx` | PC | 必要 | PC
+`/dashboard/analysis` | `(dashboard)/dashboard/analysis/page.tsx` | PC | 必要 | PC
 `/scan` | `(mobile)/scan/page.tsx` | スマホ | 必要 | スマホ
-`/bookshelf` | `bookshelf/page.tsx` | 両方 | 必要 | 未定
 `/books/[isbn]` | `books/[isbn]/page.tsx` | 両方 | 不要 | 未定
 `/auth/confirm` | `auth/confirm/route.ts` | – | – | バックエンド
 `/api/*` | `api/**/route.ts` | – | – | バックエンド
@@ -40,7 +42,7 @@ URL | ファイル | 端末 | ログイン | 担当
 ## page.tsx の書き方
 
 ```tsx
-// (dashboard)/collection/page.tsx（例。getMyCollection などはこれから作る）
+// (dashboard)/dashboard/collection/page.tsx（例。getMyCollection などはこれから作る）
 import { Suspense } from "react";
 
 import { CollectionList } from "@/components/desktop/CollectionList";

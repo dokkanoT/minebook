@@ -1,4 +1,4 @@
-// src/app/(dashboard)/_components/dashboard/FrequentShopsPanel.tsx
+// src/app/(dashboard)/dashboard/_components/dashboard/FrequentShopsPanel.tsx
 import { ArrowLink } from "../ui/ArrowLink";
 import { Panel } from "../ui/Panel";
 import { ProgressBar } from "../ui/ProgressBar";
@@ -28,7 +28,7 @@ export function FrequentShopsPanel({ shops }: { shops: Shop[] }) {
         ))}
       </ol>
       <div className="mt-auto pt-6">
-        <ArrowLink href="/history">発見履歴で詳しく見る</ArrowLink>
+        <ArrowLink href="/dashboard/history">発見履歴で詳しく見る</ArrowLink>
       </div>
     </Panel>
   );

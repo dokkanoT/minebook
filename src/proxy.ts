@@ -5,10 +5,7 @@ import { updateSession } from "@/lib/supabase/proxy";
 // ログイン必須のパス（前方一致）
 const PROTECTED_PATHS = [
   "/dashboard",
-  "/collection",
-  "/ranking",
   "/scan",
-  "/bookshelf",
 ];
 // ログイン済みならアクセス不要なパス
 const AUTH_PATHS = ["/login", "/register"];

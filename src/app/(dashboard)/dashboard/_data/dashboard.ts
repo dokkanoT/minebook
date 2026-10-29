@@ -1,4 +1,4 @@
-// src/app/(dashboard)/_data/dashboard.ts
+// src/app/(dashboard)/dashboard/_data/dashboard.ts
 import { CATEGORY_COUNTS, MOCK_BOOKS, MOCK_COLLECTION_COUNT } from "./books";
 import { UNSAVED_SCAN_COUNT } from "./history";
 
@@ -48,16 +48,16 @@ export const FREQUENT_SHOPS = [
 ];
 
 export const QUICK_LINKS = [
-  { href: "/bookshelf", title: "本棚を見る", description: `${total}冊を検索・並び替え` },
-  { href: "/collection", title: "コレクションを整理", description: `${MOCK_COLLECTION_COUNT}件の編集とタグ管理` },
-  { href: "/ranking", title: "ランキングを見る", description: "読書家の価値で本を比較" },
+  { href: "/dashboard/bookshelf", title: "本棚を見る", description: `${total}冊を検索・並び替え` },
+  { href: "/dashboard/collection", title: "コレクションを整理", description: `${MOCK_COLLECTION_COUNT}件の編集とタグ管理` },
+  { href: "/dashboard/ranking", title: "ランキングを見る", description: "読書家の価値で本を比較" },
   {
-    href: "/history",
+    href: "/dashboard/history",
     title: "発見履歴を見る",
     description: "スキャン・店舗・価格を確認",
     badge: `未保存 ${UNSAVED_SCAN_COUNT}`,
   },
-  { href: "/analysis", title: "関心分析を見る", description: "統計と収集傾向を確認" },
+  { href: "/dashboard/analysis", title: "関心分析を見る", description: "統計と収集傾向を確認" },
 ];
 
 export const RECENT_BOOKS = MOCK_BOOKS.slice(0, 4);
