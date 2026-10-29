@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, Zap, ZapOff, CheckCircle2, AlertCircle } from 'lucide-react';
 
-interface ScannedItem {
+export interface ScannedItem {
   id: string;
   title: string;
   statusText: string;
@@ -12,37 +12,52 @@ interface ScannedItem {
   isNew?: boolean;
 }
 
-interface ScanScreenProps {
+export interface ScanScreenProps {
   onBack?: () => void;
   onOpenEvaluation?: (item: ScannedItem) => void;
+  scannedList?: ScannedItem[];
+  onScannedListChange?: (list: ScannedItem[]) => void;
 }
 
-export const ScanScreen = ({ onOpenEvaluation }: ScanScreenProps) => {
+export const DEFAULT_SCANNED_LIST: ScannedItem[] = [
+  {
+    id: 'scanned-1',
+    title: '古書のある風景',
+    statusText: '未評価・店頭価格未入力',
+    isEvaluated: false,
+  },
+  {
+    id: 'scanned-2',
+    title: '夜を読む',
+    statusText: '未評価・店頭価格未入力',
+    isEvaluated: false,
+  },
+  {
+    id: 'scanned-3',
+    title: '小さな物語',
+    statusText: '評価済・未保存・A（表示例）',
+    isEvaluated: true,
+    rank: 'A',
+  },
+];
+
+export const ScanScreen = ({
+  onOpenEvaluation,
+  scannedList: externalScannedList,
+  onScannedListChange,
+}: ScanScreenProps) => {
   const [flashOn, setFlashOn] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [internalList, setInternalList] = useState<ScannedItem[]>(DEFAULT_SCANNED_LIST);
 
-  // 読取済みリスト
-  const [scannedList, setScannedList] = useState<ScannedItem[]>([
-    {
-      id: 'scanned-1',
-      title: '古書のある風景',
-      statusText: '未評価・店頭価格未入力',
-      isEvaluated: false,
-    },
-    {
-      id: 'scanned-2',
-      title: '夜を読む',
-      statusText: '未評価・店頭価格未入力',
-      isEvaluated: false,
-    },
-    {
-      id: 'scanned-3',
-      title: '小さな物語',
-      statusText: '評価済・未保存・A（表示例）',
-      isEvaluated: true,
-      rank: 'A',
-    },
-  ]);
+  const scannedList = externalScannedList ?? internalList;
+  const updateScannedList = (updater: (prev: ScannedItem[]) => ScannedItem[]) => {
+    if (externalScannedList && onScannedListChange) {
+      onScannedListChange(updater(externalScannedList));
+    } else {
+      setInternalList(updater);
+    }
+  };
 
   const unevaluatedCount = scannedList.filter((item) => !item.isEvaluated).length;
 
@@ -69,7 +84,7 @@ export const ScanScreen = ({ onOpenEvaluation }: ScanScreenProps) => {
         isNew: true, // ★ 新規追加フラグ
       };
 
-      setScannedList((prev) => [
+      updateScannedList((prev) => [
         newBook,
         ...prev.map((b) => ({ ...b, isNew: false })),
       ]);
