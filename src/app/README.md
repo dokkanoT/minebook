@@ -98,8 +98,10 @@ app/（画面の入口）
 ログイン・登録・ログアウト | `signIn` / `signUp` / `signOut` from `@/features/auth/actions`
 ISBN から書籍情報を取得 | `lookupBook` from `@/features/books/actions`
 自分のコレクション一覧・1件（本棚・カテゴリー・タグで絞り込み可） | `getMyCollection` / `getCollectionItem` from `@/features/collection/server`
-コレクションに追加・更新・削除 | `addToCollection` / `updateCollectionItem` / `removeFromCollection` from `@/features/collection/actions`
+本の登録・更新・削除（棚への配置は `placeOnShelf`） | `addToCollection` / `updateCollectionItem` / `removeFromCollection` from `@/features/collection/actions`
 自分の本棚一覧（冊数付き） | `getMyShelves` from `@/features/shelves/server`
+本棚画面用のデータ（棚ごとの本を並び順で・平均お宝度・収集プール） | `getMyBookshelf` from `@/features/shelves/server`
+本を棚に置く・並び替え・別の棚へ移動 / 棚から外す | `placeOnShelf` / `removeFromShelf` from `@/features/shelves/actions`
 本棚の作成・名前変更・削除 | `createShelf` / `renameShelf` / `deleteShelf` from `@/features/shelves/actions`
 自分のタグ一覧 | `getMyTags` from `@/features/tags/server`
 タグの作成・編集・削除、本へのタグ付け | `createTag` / `editTag` / `deleteTag` / `setItemTags` from `@/features/tags/actions`
