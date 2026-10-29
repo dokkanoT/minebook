@@ -8,17 +8,37 @@
 
 URL | ファイル | 端末 | ログイン | 担当
 ---|---|---|---|---
-`/` | `page.tsx` | 両方 | 不要 | 未定
-`/login` | `(auth)/login/page.tsx` | 両方 | 不要（ログイン済みは `/` へ） | 未定
-`/register` | `(auth)/register/page.tsx` | 両方 | 不要（ログイン済みは `/` へ） | 未定
+`/` | `page.tsx` | 両方 | – | バックエンド（振り分け専用。下記）
+`/login` | `(auth)/login/page.tsx` | 両方 | 不要（ログイン済みは振り分け先へ） | 見た目：スマホ / 仕組み：バックエンド
+`/register` | `(auth)/register/page.tsx` | 両方 | 不要（ログイン済みは振り分け先へ） | 見た目：スマホ / 仕組み：バックエンド
 `/dashboard` | `(dashboard)/dashboard/page.tsx` | PC | 必要 | PC
+`/bookshelf` | `(dashboard)/bookshelf/page.tsx` | PC | 必要 | PC
 `/collection` | `(dashboard)/collection/page.tsx` | PC | 必要 | PC
 `/ranking` | `(dashboard)/ranking/page.tsx` | PC | 必要 | PC
+`/history` | `(dashboard)/history/page.tsx` | PC | 必要 | PC
+`/analysis` | `(dashboard)/analysis/page.tsx` | PC | 必要 | PC
+`/home` | `(mobile)/home/page.tsx` | スマホ | 必要 | スマホ
 `/scan` | `(mobile)/scan/page.tsx` | スマホ | 必要 | スマホ
-`/bookshelf` | `bookshelf/page.tsx` | 両方 | 必要 | 未定
-`/books/[isbn]` | `books/[isbn]/page.tsx` | 両方 | 不要 | 未定
+`/books/[isbn]` | `books/[isbn]/page.tsx` | 両方 | 不要 | スマホ
 `/auth/confirm` | `auth/confirm/route.ts` | – | – | バックエンド
 `/api/*` | `api/**/route.ts` | – | – | バックエンド
+
+### `/` の振り分け（`src/proxy.ts`）
+
+```text
+/ にアクセス
+ ├─ 未ログイン → /login
+ └─ ログイン済み
+     ├─ スマホ（User-Agent が mobile）→ /home
+     └─ それ以外（PC・タブレット）    → /dashboard
+```
+
+- ログイン・登録・メール確認の後は `/` に戻るので、ここで各端末の画面に振り分けられる
+- ログイン済みで `/login` `/register` を開いた場合も同じ振り分け先へ
+- **`/` に画面を作らない**（`page.tsx` や `(dashboard)/page.tsx`・`(mobile)/page.tsx` を置かない。どれも `/` になり、重複するとビルドエラー）
+- iPad の Safari は PC として判定される（タブレットは PC 扱いの方針なので問題なし）
+
+### 注意
 
 - 「ログイン必要」のパスは `src/proxy.ts` の `PROTECTED_PATHS` で未ログイン時に `/login` へリダイレクトされる。**ページを追加・URL を変更したら `PROTECTED_PATHS` も更新する**（バックエンドに依頼）
 - `(auth)` `(dashboard)` `(mobile)` は route group で **URL には出ない**。端末で画面を出し分ける仕組みではないので、PC 向けページもスマホ幅で崩れない程度にはしておく
