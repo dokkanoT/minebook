@@ -1,4 +1,5 @@
 allowBuilds:
+  pnpm: set this to true or false
   unrs-resolver: true
 minimumReleaseAgeExclude:
   - '@next/env@16.4.1'
