@@ -1,14 +1,14 @@
 // src/app/(dashboard)/dashboard/page.tsx
-import { FrequentShopsPanel } from "../_components/dashboard/FrequentShopsPanel";
-import { MiniBarChart } from "../_components/dashboard/MiniBarChart";
-import { MiniDonut } from "../_components/dashboard/MiniDonut";
-import { MonthlySavedChart } from "../_components/dashboard/MonthlySavedChart";
-import { QuickLinkCard } from "../_components/dashboard/QuickLinkCard";
-import { RecentBooksPanel } from "../_components/dashboard/RecentBooksPanel";
-import { PageFooter } from "../_components/layout/PageFooter";
-import { PageHeader } from "../_components/layout/PageHeader";
-import { StatCard } from "../_components/shared/StatCard";
-import { Badge } from "../_components/ui/Badge";
+import { FrequentShopsPanel } from "./_components/dashboard/FrequentShopsPanel";
+import { MiniBarChart } from "./_components/dashboard/MiniBarChart";
+import { MiniDonut } from "./_components/dashboard/MiniDonut";
+import { MonthlySavedChart } from "./_components/dashboard/MonthlySavedChart";
+import { QuickLinkCard } from "./_components/dashboard/QuickLinkCard";
+import { RecentBooksPanel } from "./_components/dashboard/RecentBooksPanel";
+import { PageFooter } from "./_components/layout/PageFooter";
+import { PageHeader } from "./_components/layout/PageHeader";
+import { StatCard } from "./_components/shared/StatCard";
+import { Badge } from "./_components/ui/Badge";
 import {
   DASHBOARD_STATS,
   FREQUENT_SHOPS,
@@ -16,7 +16,7 @@ import {
   MONTHLY_6M,
   QUICK_LINKS,
   RECENT_BOOKS,
-} from "../_data/dashboard";
+} from "./_data/dashboard";
 
 // TODO: バックエンド接続後は features/○○/server.ts の関数に差し替える。
 // 非同期データを取る部分は <Suspense> で包むこと。
