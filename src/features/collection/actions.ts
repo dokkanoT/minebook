@@ -16,11 +16,9 @@ import {
 import { normalizeIsbn } from "@/lib/utils/isbn";
 import { idSchema, optionalText, optionalYen } from "@/lib/utils/schemas";
 
-const SHELF_NOT_FOUND = "指定した本棚が見つかりません";
-
-// 追加・更新で共通の項目（すべて任意）
+// 追加・更新で共通の項目（すべて任意）。
+// 棚への配置は並び順も必要なので、shelves の placeOnShelf / removeFromShelf で行う
 const detailsSchema = z.object({
-  shelfId: idSchema.nullish(),
   storePrice: optionalYen,
   storeName: optionalText(50),
   purchaseDate: z.iso.date("日付の形式が正しくありません").nullish(),
@@ -32,7 +30,7 @@ const addSchema = detailsSchema.extend({
   isbn: z.string().min(1, "ISBN を入力してください"),
 });
 
-// スキャンした本をコレクションに追加する（初出の本は books にも登録される）
+// スキャンした本を登録する（初出の本は books にも登録される）。登録した本は未配置になる
 export async function addToCollection(
   input: z.input<typeof addSchema>,
 ): Promise<ActionResult<{ id: string }>> {
@@ -59,9 +57,7 @@ export async function addToCollection(
     .insert({ user_id: user.id, isbn: book.isbn, ...toColumns(details) })
     .select("id")
     .single();
-  // 他人の本棚を指定した場合は RLS 違反（42501）になる
-  if (error?.code === "42501") return failure(SHELF_NOT_FOUND);
-  if (error) return dbFailure(error, { foreignKey: SHELF_NOT_FOUND });
+  if (error) return dbFailure(error);
 
   refresh();
   return success({ id: data.id });
@@ -84,8 +80,7 @@ export async function updateCollectionItem(
     .update(toColumns(details))
     .eq("id", id)
     .select("id");
-  if (error?.code === "42501") return failure(SHELF_NOT_FOUND);
-  if (error) return dbFailure(error, { foreignKey: SHELF_NOT_FOUND });
+  if (error) return dbFailure(error);
   if (data.length === 0) return failure("本が見つかりません");
 
   refresh();
@@ -117,7 +112,6 @@ export async function removeFromCollection(
 // camelCase の入力を DB のカラム名に変換（undefined の項目は含めない＝更新しない）
 function toColumns(details: Partial<z.output<typeof detailsSchema>>) {
   const columns = {
-    shelf_id: details.shelfId,
     store_price: details.storePrice,
     store_name: details.storeName,
     purchase_date: details.purchaseDate,
