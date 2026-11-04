@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 
+import { GoogleSignInButton } from "@/features/auth/components/GoogleSignInButton";
 import { RegisterForm } from "@/features/auth/components/RegisterForm";
 
 export default function RegisterPage() {
@@ -19,6 +20,9 @@ export default function RegisterPage() {
             無料で本棚を使い始めましょう。
           </p>
         </div>
+
+        {/* Google ログインボタン */}
+        <GoogleSignInButton />
 
         {/* 登録フォーム */}
         <RegisterForm />

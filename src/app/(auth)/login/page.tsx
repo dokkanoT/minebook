@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { BookOpen } from "lucide-react";
 
+import { GoogleSignInButton } from "@/features/auth/components/GoogleSignInButton";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 
 type SearchParams = Promise<{ next?: string; error?: string }>;
@@ -67,9 +68,18 @@ async function LoginFormWithParams({
           role="alert"
           className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium"
         >
-          メール確認に失敗しました。もう一度お試しください。
+          メール確認またはログインに失敗しました。もう一度お試しください
         </div>
       )}
+      {error === "oauth_failed" && (
+        <div
+          role="alert"
+          className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium"
+        >
+          Google ログインを開始できませんでした。時間をおいて再度お試しください
+        </div>
+      )}
+      <GoogleSignInButton next={next} />
       <LoginForm next={next} />
     </>
   );

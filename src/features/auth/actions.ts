@@ -5,18 +5,12 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
+import { safeRedirectPath } from "./safe-redirect";
 import type { AuthFormState } from "./types";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_MIN_LENGTH = 8;
 const DISPLAY_NAME_MAX_LENGTH = 30;
-
-// オープンリダイレクト対策: 自サイト内の相対パスだけ許可
-function safeRedirectPath(next: FormDataEntryValue | null) {
-  if (typeof next !== "string") return "/";
-  if (!next.startsWith("/") || next.startsWith("//")) return "/";
-  return next;
-}
 
 function readSignUpFields(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
@@ -100,6 +94,23 @@ export async function signIn(
   }
 
   redirect(safeRedirectPath(formData.get("next")));
+}
+
+// Google のログイン画面へ移動する。ログイン・新規登録のどちらにも使う
+// 戻り先の /auth/confirm で code をセッションに交換する
+export async function signInWithGoogle(formData: FormData) {
+  const next = safeRedirectPath(formData.get("next"));
+  const origin = (await headers()).get("origin") ?? "";
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}`,
+    },
+  });
+
+  if (error || !data.url) redirect("/login?error=oauth_failed");
+  redirect(data.url);
 }
 
 export async function signOut() {

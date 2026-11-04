@@ -127,6 +127,7 @@ export type Database = {
           purchase_date: string | null
           scanned_at: string
           shelf_id: string | null
+          shelf_position: string | null
           status: string | null
           store_name: string | null
           store_price: number | null
@@ -141,6 +142,7 @@ export type Database = {
           purchase_date?: string | null
           scanned_at?: string
           shelf_id?: string | null
+          shelf_position?: string | null
           status?: string | null
           store_name?: string | null
           store_price?: number | null
@@ -155,6 +157,7 @@ export type Database = {
           purchase_date?: string | null
           scanned_at?: string
           shelf_id?: string | null
+          shelf_position?: string | null
           status?: string | null
           store_name?: string | null
           store_price?: number | null

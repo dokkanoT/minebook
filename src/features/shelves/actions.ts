@@ -14,6 +14,8 @@ import {
 } from "@/lib/utils/action-result";
 import { idSchema, nameSchema } from "@/lib/utils/schemas";
 
+import { computeShelfPosition } from "./position";
+
 const SHELF_NAME_MAX = 30;
 const DUPLICATE_NAME = "同じ名前の本棚がすでにあります";
 
@@ -82,6 +84,85 @@ export async function deleteShelf(
     .select("id");
   if (error) return dbFailure(error);
   if (data.length === 0) return failure("本棚が見つかりません");
+
+  refresh();
+  return success(null);
+}
+
+const placeSchema = z.object({
+  itemId: idSchema,
+  shelfId: idSchema,
+  // この本の直前に置く。省略・null なら棚の末尾
+  beforeItemId: idSchema.nullish(),
+});
+
+// 本を棚に置く。プールからの配置・棚の中での並び替え・別の棚への移動のすべてに使う
+export async function placeOnShelf(
+  input: z.input<typeof placeSchema>,
+): Promise<ActionResult> {
+  await requireUser();
+  const parsed = placeSchema.safeParse(input);
+  if (!parsed.success) return invalidInput(parsed.error);
+  const { itemId, shelfId, beforeItemId } = parsed.data;
+  if (beforeItemId === itemId) return success(null);
+
+  const supabase = await createClient();
+  const { data: shelf, error: shelfError } = await supabase
+    .from("shelves")
+    .select("id")
+    .eq("id", shelfId)
+    .maybeSingle();
+  if (shelfError) return dbFailure(shelfError);
+  if (!shelf) return failure("本棚が見つかりません");
+
+  // 同時に同じ位置へ置かれて並び順が重複した場合は、計算し直してもう一度だけ試す
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let position;
+    try {
+      position = await computeShelfPosition(supabase, {
+        itemId,
+        shelfId,
+        beforeItemId,
+      });
+    } catch (e) {
+      return dbFailure(e as { message: string });
+    }
+    if (!position.ok) return failure("置く位置の本が見つかりません");
+
+    const { data, error } = await supabase
+      .from("collection_items")
+      .update({ shelf_id: shelfId, shelf_position: position.position })
+      .eq("id", itemId)
+      .select("id");
+    if (error?.code === "23505") continue;
+    if (error) return dbFailure(error);
+    if (data.length === 0) return failure("本が見つかりません");
+
+    refresh();
+    return success(null);
+  }
+  return failure("ほかの操作と重なりました。もう一度お試しください");
+}
+
+const removeFromShelfSchema = z.object({ itemId: idSchema });
+
+// 棚から外して未配置に戻す（本の登録やタグは消えない）
+export async function removeFromShelf(
+  input: z.input<typeof removeFromShelfSchema>,
+): Promise<ActionResult> {
+  await requireUser();
+  const parsed = removeFromShelfSchema.safeParse(input);
+  if (!parsed.success) return invalidInput(parsed.error);
+
+  const supabase = await createClient();
+  // shelf_position は DB のトリガーで null になる
+  const { data, error } = await supabase
+    .from("collection_items")
+    .update({ shelf_id: null })
+    .eq("id", parsed.data.itemId)
+    .select("id");
+  if (error) return dbFailure(error);
+  if (data.length === 0) return failure("本が見つかりません");
 
   refresh();
   return success(null);

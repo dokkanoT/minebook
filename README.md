@@ -76,13 +76,15 @@ RAKUTEN_ACCESS_KEY=
 RAKUTEN_REFERER=
 ```
 
-## 認証（Supabase Auth / メール+パスワード）
+## 認証（Supabase Auth / メール+パスワード・Google）
 
 フロントエンド（PC・スマホ）からは以下を使ってください。
 
 用途 | import
 ---|---
 ログイン / 登録 / ログアウト（`useActionState` 対応） | `signIn` / `signUp` / `signOut` from `@/features/auth/actions`
+Google でログイン・登録（`<form action>` に渡す） | `signInWithGoogle` from `@/features/auth/actions`
+Google ログインのボタン（仮実装） | `GoogleSignInButton` from `@/features/auth/components/GoogleSignInButton`
 フォーム状態の型 | `AuthFormState` from `@/features/auth/types`
 Server Component でユーザー取得 | `getCurrentUser` / `requireUser` from `@/features/auth/dal`
 Client Component から Supabase | `createClient` from `@/lib/supabase/client`
@@ -90,6 +92,9 @@ Client Component から Supabase | `createClient` from `@/lib/supabase/client`
 - `/dashboard` `/collection` `/ranking` `/scan` `/bookshelf` は未ログインだと `/login?next=...` へリダイレクト（`src/proxy.ts`）
 - フォームの name 属性: `email` / `password` / `displayName`（登録のみ）/ `next`（ログインのみ・hidden）
 - `src/features/auth/components/` のフォームは動作確認用の仮実装なので、各端末向けに差し替えてOK
+- Google ログインはブラウザから Supabase を直接呼ばず、必ず `signInWithGoogle` を使う。フォームに `next`（hidden）を入れると、ログイン後にそのページへ戻る
+- LINE・Instagram などのアプリ内ブラウザでは Google ログインが使えない（Google の制限）。メール+パスワードも残しておく
+- `/login` のエラー表示: `?error=confirm_failed`（メール確認・Google ログインの失敗）/ `?error=oauth_failed`（Google ログインを開始できなかった）
 
 ## 書籍情報（books）
 
