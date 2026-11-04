@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { GoogleSignInButton } from "@/features/auth/components/GoogleSignInButton";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 
 type SearchParams = Promise<{ next?: string; error?: string }>;
@@ -33,8 +34,16 @@ async function LoginFormWithParams({
   return (
     <>
       {error === "confirm_failed" && (
-        <p role="alert">メール確認に失敗しました。もう一度お試しください</p>
+        <p role="alert">
+          メール確認またはログインに失敗しました。もう一度お試しください
+        </p>
       )}
+      {error === "oauth_failed" && (
+        <p role="alert">
+          Google ログインを開始できませんでした。時間をおいて再度お試しください
+        </p>
+      )}
+      <GoogleSignInButton next={next} />
       <LoginForm next={next} />
     </>
   );

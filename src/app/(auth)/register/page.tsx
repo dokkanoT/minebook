@@ -1,11 +1,13 @@
 import Link from "next/link";
 
+import { GoogleSignInButton } from "@/features/auth/components/GoogleSignInButton";
 import { RegisterForm } from "@/features/auth/components/RegisterForm";
 
 export default function RegisterPage() {
   return (
     <main className="mx-auto flex w-full max-w-sm flex-col gap-6 p-6">
       <h1 className="text-xl font-bold">アカウント作成</h1>
+      <GoogleSignInButton />
       <RegisterForm />
       <Link href="/login" className="underline">
         ログインはこちら
