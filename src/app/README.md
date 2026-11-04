@@ -20,7 +20,7 @@ URL | ファイル | 端末 | ログイン | 担当
 `/home` | `(mobile)/home/page.tsx` | スマホ | 必要 | スマホ
 `/scan` | `(mobile)/scan/page.tsx` | スマホ | 必要 | スマホ
 `/books/[isbn]` | `books/[isbn]/page.tsx` | 両方 | 不要 | スマホ
-`/auth/confirm` | `auth/confirm/route.ts` | – | – | バックエンド
+`/auth/confirm` | `auth/confirm/route.ts`（確認メールと Google ログインの戻り先） | – | – | バックエンド
 `/api/*` | `api/**/route.ts` | – | – | バックエンド
 
 ### `/` の振り分け（`src/proxy.ts`）
@@ -115,7 +115,7 @@ app/（画面の入口）
 用途 | import
 ---|---
 ログインユーザー取得（Server Component） | `getCurrentUser` / `requireUser` from `@/features/auth/dal`
-ログイン・登録・ログアウト | `signIn` / `signUp` / `signOut` from `@/features/auth/actions`
+ログイン・登録・ログアウト | `signIn` / `signUp` / `signInWithGoogle` / `signOut` from `@/features/auth/actions`
 ISBN から書籍情報を取得 | `lookupBook` from `@/features/books/actions`
 自分のコレクション一覧・1件（本棚・カテゴリー・タグで絞り込み可） | `getMyCollection` / `getCollectionItem` from `@/features/collection/server`
 本の登録・更新・削除（棚への配置は `placeOnShelf`） | `addToCollection` / `updateCollectionItem` / `removeFromCollection` from `@/features/collection/actions`
