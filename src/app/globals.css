@@ -24,3 +24,56 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+/* 本が追加された時の上からのフェードイン */
+@keyframes slideDownFade {
+  0% {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-slide-down {
+  animation: slideDownFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* フラグメニューが開く時のポップアップアニメーション */
+@keyframes popMenuOpen {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateX(12px) translateY(-6px);
+  }
+  75% {
+    transform: scale(1.03) translateX(0) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateX(0) translateY(0);
+  }
+}
+
+.animate-pop-menu {
+  transform-origin: top right;
+  animation: popMenuOpen 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+/* 画面（タブ）切り替え時のフェードインアニメーション */
+@keyframes tabFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-tab-change {
+  animation: tabFadeIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
