@@ -125,7 +125,7 @@ export function PriceInputSection({
                 お得額: +¥{(originalPrice - numericVal).toLocaleString()}
               </span>
               <span
-                className={`text-[10px] text-white px-1.5 py-0.2 rounded font-black ${
+                className={`text-[10px] text-white px-1.5 py-px rounded font-black ${
                   (originalPrice - numericVal) / originalPrice >= 0.75
                     ? 'bg-amber-500'
                     : 'bg-indigo-500'

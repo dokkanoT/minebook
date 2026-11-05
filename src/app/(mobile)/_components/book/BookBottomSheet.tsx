@@ -252,7 +252,7 @@ export function BookBottomSheet({
                     >
                       <PenLine className="w-3.5 h-3.5 text-[#9A6218]" />
                       <span>店頭価格 未入力</span>
-                      <span className="text-[10px] bg-[#9A6218] text-white px-1.5 py-0.2 rounded font-normal">
+                      <span className="text-[10px] bg-[#9A6218] text-white px-1.5 py-px rounded font-normal">
                         入力する
                       </span>
                     </button>

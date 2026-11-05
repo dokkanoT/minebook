@@ -264,7 +264,7 @@ export const ScanScreen = ({
                         {item.title}
                       </h4>
                       {item.isNew && (
-                        <span className="text-[9px] font-black text-amber-700 bg-amber-200 px-1 py-0.2 rounded shrink-0">
+                        <span className="text-[9px] font-black text-amber-700 bg-amber-200 px-1 py-px rounded shrink-0">
                           NEW
                         </span>
                       )}

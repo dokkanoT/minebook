@@ -97,7 +97,7 @@ export function HomeView({ books, onBookClick, onStartScan }: HomeViewProps) {
                       {book.scanDate}
                     </span>
                     {!book.isEvaluated && (
-                      <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-800 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
+                      <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-800 bg-amber-50 px-1.5 py-px rounded border border-amber-200">
                         <Clock className="w-2.5 h-2.5 text-amber-600" /> 未評価
                       </span>
                     )}
