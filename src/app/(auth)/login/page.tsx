@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { BookOpen } from "lucide-react";
 
+import { AuthDivider } from "@/features/auth/components/AuthDivider";
 import { GoogleSignInButton } from "@/features/auth/components/GoogleSignInButton";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 
@@ -80,6 +81,7 @@ async function LoginFormWithParams({
         </div>
       )}
       <GoogleSignInButton next={next} />
+      <AuthDivider />
       <LoginForm next={next} />
     </>
   );
