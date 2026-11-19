@@ -5,7 +5,7 @@ import { InterestSummaryPanel } from "../_components/analysis/InterestSummaryPan
 import { TagUsagePanel } from "../_components/analysis/TagUsagePanel";
 import { PageFooter } from "../_components/layout/PageFooter";
 import { PageHeader } from "../_components/layout/PageHeader";
-import { StatCard } from "../_components/shared/StatCard";
+import { StatCard } from "@/components/common/StatCard";
 import {
   ANALYSIS_META,
   ANALYSIS_TOP_CARDS,

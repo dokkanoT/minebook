@@ -1,7 +1,7 @@
 // src/app/(dashboard)/dashboard/_components/dashboard/FrequentShopsPanel.tsx
-import { ArrowLink } from "../ui/ArrowLink";
-import { Panel } from "../ui/Panel";
-import { ProgressBar } from "../ui/ProgressBar";
+import { ArrowLink } from "@/components/ui/ArrowLink";
+import { Panel } from "@/components/ui/Panel";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 
 type Shop = { name: string; count: number };
 

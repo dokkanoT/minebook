@@ -1,7 +1,7 @@
 // src/app/(dashboard)/dashboard/_components/dashboard/RecentBooksPanel.tsx
-import { BookCard } from "../shared/BookCard";
-import { ArrowLink } from "../ui/ArrowLink";
-import { Panel } from "../ui/Panel";
+import { BookCard } from "@/components/common/BookCard";
+import { ArrowLink } from "@/components/ui/ArrowLink";
+import { Panel } from "@/components/ui/Panel";
 
 type RecentBook = {
   id: string;

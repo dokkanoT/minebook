@@ -1,7 +1,7 @@
 // src/app/(dashboard)/_components/collection/TagManagementPanel.tsx
-import { Badge } from "../ui/Badge";
-import { OutlineButton } from "../ui/OutlineButton";
-import { Panel } from "../ui/Panel";
+import { Badge } from "@/components/ui/Badge";
+import { OutlineButton } from "@/components/ui/OutlineButton";
+import { Panel } from "@/components/ui/Panel";
 
 export function TagManagementPanel({ tags }: { tags: string[] }) {
   return (

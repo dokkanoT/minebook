@@ -1,7 +1,7 @@
 // src/app/(dashboard)/_components/collection/CollectionList.tsx
 import { Folder } from "lucide-react";
-import { OutlineButton } from "../ui/OutlineButton";
-import { Panel } from "../ui/Panel";
+import { OutlineButton } from "@/components/ui/OutlineButton";
+import { Panel } from "@/components/ui/Panel";
 
 type CollectionListItem = { id: string; name: string; count: number };
 

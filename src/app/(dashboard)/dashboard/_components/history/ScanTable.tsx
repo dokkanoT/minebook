@@ -1,6 +1,6 @@
 // src/app/(dashboard)/_components/history/ScanTable.tsx
-import { Badge } from "../ui/Badge";
-import { Panel } from "../ui/Panel";
+import { Badge } from "@/components/ui/Badge";
+import { Panel } from "@/components/ui/Panel";
 
 export type ScanRecord = {
   id: string;

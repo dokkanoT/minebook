@@ -1,5 +1,5 @@
 // src/app/(dashboard)/_components/analysis/AverageScorePanel.tsx
-import { Panel } from "../ui/Panel";
+import { Panel } from "@/components/ui/Panel";
 
 type Row = { label: string; average: number };
 

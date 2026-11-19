@@ -1,5 +1,5 @@
 // src/app/(dashboard)/_components/history/ScanCalendar.tsx
-import { Panel } from "../ui/Panel";
+import { Panel } from "@/components/ui/Panel";
 
 const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
 

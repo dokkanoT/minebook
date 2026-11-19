@@ -1,5 +1,5 @@
 // src/app/(dashboard)/_components/history/ScanFilterPanel.tsx
-import { Panel } from "../ui/Panel";
+import { Panel } from "@/components/ui/Panel";
 
 export type ScanStatusFilter = "all" | "saved" | "unsaved";
 

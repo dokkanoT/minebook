@@ -2,8 +2,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Badge } from "../ui/Badge";
-import { Panel } from "../ui/Panel";
+import { Badge } from "@/components/ui/Badge";
+import { Panel } from "@/components/ui/Panel";
 import { BookTile, type TileBook } from "./BookTile";
 
 export type PoolBook = TileBook & {

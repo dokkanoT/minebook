@@ -1,6 +1,6 @@
 // src/app/(dashboard)/_components/dashboard/QuickLinkCard.tsx
 import Link from "next/link";
-import { Badge } from "../ui/Badge";
+import { Badge } from "@/components/ui/Badge";
 
 type QuickLinkCardProps = {
   href: string;

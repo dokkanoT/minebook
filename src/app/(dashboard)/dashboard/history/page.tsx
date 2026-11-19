@@ -3,8 +3,8 @@ import { ScanCalendar } from "../_components/history/ScanCalendar";
 import { ScanHistoryExplorer } from "../_components/history/ScanHistoryExplorer";
 import { PageFooter } from "../_components/layout/PageFooter";
 import { PageHeader } from "../_components/layout/PageHeader";
-import { StatCard } from "../_components/shared/StatCard";
-import { BarTrack } from "../_components/ui/BarTrack";
+import { StatCard } from "@/components/common/StatCard";
+import { BarTrack } from "@/components/ui/BarTrack";
 import { HISTORY_STATS, SCAN_CALENDAR, SCAN_RECORDS } from "../_data/history";
 
 export default function HistoryPage() {

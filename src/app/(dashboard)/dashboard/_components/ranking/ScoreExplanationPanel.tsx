@@ -1,5 +1,5 @@
 // src/app/(dashboard)/_components/ranking/ScoreExplanationPanel.tsx
-import { Panel } from "../ui/Panel";
+import { Panel } from "@/components/ui/Panel";
 
 type Criterion = { title: string; description: string };
 

@@ -1,6 +1,6 @@
 // src/app/(dashboard)/_components/analysis/CategoryDistributionPanel.tsx
-import { Panel } from "../ui/Panel";
-import { ProgressBar } from "../ui/ProgressBar";
+import { Panel } from "@/components/ui/Panel";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 
 type CategoryItem = { label: string; count: number };
 

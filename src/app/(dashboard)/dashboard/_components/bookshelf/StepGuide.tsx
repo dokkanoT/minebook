@@ -1,5 +1,5 @@
 // src/app/(dashboard)/_components/bookshelf/StepGuide.tsx
-import { Panel } from "../ui/Panel";
+import { Panel } from "@/components/ui/Panel";
 
 export type StepItem = {
   step: string;

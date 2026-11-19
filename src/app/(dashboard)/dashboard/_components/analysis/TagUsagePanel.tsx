@@ -1,8 +1,8 @@
 // src/app/(dashboard)/dashboard/_components/analysis/TagUsagePanel.tsx
-import { ArrowLink } from "../ui/ArrowLink";
-import { Badge } from "../ui/Badge";
-import { BarTrack } from "../ui/BarTrack";
-import { Panel } from "../ui/Panel";
+import { ArrowLink } from "@/components/ui/ArrowLink";
+import { Badge } from "@/components/ui/Badge";
+import { BarTrack } from "@/components/ui/BarTrack";
+import { Panel } from "@/components/ui/Panel";
 
 type TagCount = { label: string; count: number };
 

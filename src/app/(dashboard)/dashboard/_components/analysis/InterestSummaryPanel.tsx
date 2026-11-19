@@ -1,6 +1,6 @@
 // src/app/(dashboard)/_components/analysis/InterestSummaryPanel.tsx
-import { NoteBox } from "../ui/NoteBox";
-import { Panel } from "../ui/Panel";
+import { NoteBox } from "@/components/ui/NoteBox";
+import { Panel } from "@/components/ui/Panel";
 
 type InterestSummaryPanelProps = {
   headline: string;

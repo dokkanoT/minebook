@@ -1,7 +1,7 @@
 // src/app/(dashboard)/_components/ranking/RankingTable.tsx
-import { BarTrack } from "../ui/BarTrack";
-import { BookThumb } from "../ui/BookThumb";
-import { Panel } from "../ui/Panel";
+import { BarTrack } from "@/components/ui/BarTrack";
+import { BookThumb } from "@/components/ui/BookThumb";
+import { Panel } from "@/components/ui/Panel";
 
 export type RankingRow = {
   id: string;

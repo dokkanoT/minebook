@@ -1,7 +1,7 @@
 // src/app/(dashboard)/_components/collection/CollectionDetailPanel.tsx
-import { BookCard } from "../shared/BookCard";
-import { OutlineButton } from "../ui/OutlineButton";
-import { Panel } from "../ui/Panel";
+import { BookCard } from "@/components/common/BookCard";
+import { OutlineButton } from "@/components/ui/OutlineButton";
+import { Panel } from "@/components/ui/Panel";
 import type { CollectionView } from "./CollectionWorkspace";
 
 export function CollectionDetailPanel({ collection }: { collection: CollectionView }) {

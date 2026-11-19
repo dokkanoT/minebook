@@ -1,5 +1,5 @@
 // src/app/(dashboard)/_components/bookshelf/OperationRulesPanel.tsx
-import { Panel } from "../ui/Panel";
+import { Panel } from "@/components/ui/Panel";
 
 export type RuleItem = {
   title: string;

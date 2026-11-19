@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Panel } from "../ui/Panel";
+import { Panel } from "@/components/ui/Panel";
 
 type MonthlyPoint = { label: string; count: number };
 type Range = "6m" | "1y";

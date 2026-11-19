@@ -1,6 +1,6 @@
 // src/app/(dashboard)/_components/bookshelf/MyShelvesPanel.tsx
-import { OutlineButton } from "../ui/OutlineButton";
-import { Panel } from "../ui/Panel";
+import { OutlineButton } from "@/components/ui/OutlineButton";
+import { Panel } from "@/components/ui/Panel";
 import { DropSlot } from "./DropSlot";
 import { ShelfCard, type ShelfView } from "./ShelfCard";
 
