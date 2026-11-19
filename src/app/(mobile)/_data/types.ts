@@ -10,6 +10,7 @@ export interface BookItem {
   categoryTag?: string;
   originalPrice: number;
   shopPrice: number;
+  coverUrl?: string;
   rank?: 'S' | 'A' | 'B';
   isEvaluated?: boolean; // お宝度判定済みかどうか（false = スキャン直後・未入力）
   storeName: string;

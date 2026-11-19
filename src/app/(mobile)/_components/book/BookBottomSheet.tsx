@@ -97,15 +97,14 @@ export function BookBottomSheet({
 
       {/* シート本体 */}
       <div
-        className={`absolute bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl border-t border-gray-200 flex flex-col transition-all duration-300 ease-out ${
-          sheetState === 'closed'
+        className={`absolute bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl border-t border-gray-200 flex flex-col transition-all duration-300 ease-out ${sheetState === 'closed'
             ? 'translate-y-full pointer-events-none invisible h-[64%]'
             : sheetState === 'full'
-            ? 'translate-y-0 pointer-events-auto visible h-[92%]'
-            : isInputtingPrice
-            ? 'translate-y-0 pointer-events-auto visible h-[84%]'
-            : 'translate-y-0 pointer-events-auto visible h-[64%]'
-        }`}
+              ? 'translate-y-0 pointer-events-auto visible h-[92%]'
+              : isInputtingPrice
+                ? 'translate-y-0 pointer-events-auto visible h-[84%]'
+                : 'translate-y-0 pointer-events-auto visible h-[64%]'
+          }`}
       >
         {/* つまみバー */}
         <div
@@ -162,10 +161,22 @@ export function BookBottomSheet({
             <div className="flex-1 overflow-y-auto min-h-0 px-5 pb-3">
               {/* 書影 & タイトル & 著者 */}
               <div className="flex gap-4 items-start">
-                <div className="w-16 h-20 bg-[#F0F1F2] rounded-2xl flex flex-col items-center justify-center text-gray-400 shrink-0">
-                  <BookOpen className="w-6 h-6 stroke-[1.5] mb-1 text-gray-400" />
-                  <span className="text-[10px] text-gray-400 font-medium">書影</span>
-                </div>
+                {selectedBook.coverUrl ? (
+                  <img
+                    src={selectedBook.coverUrl}
+                    alt={`${selectedBook.title}の表紙`}
+                    className="w-16 h-20 object-cover rounded-2xl border border-gray-200 shadow-sm shrink-0"
+
+                  />) : (
+                  <div className="w-16 h-20 bg-[#F0F1F2] rounded-2xl
+                      flex flex-col items-center justify-center
+                      text-gray-400 shrink-0">
+                    <BookOpen className="w-6 h-6 stroke-[1.5] mb-1
+                        text-gray-400" />
+                    <span className="text-[10px] text-gray-400
+                        font-medium">書影</span>
+                  </div>
+                )}
 
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base font-bold text-gray-900 leading-snug">
@@ -228,13 +239,12 @@ export function BookBottomSheet({
                       </span>
                     </div>
                     <span
-                      className={`text-white text-[11px] font-black px-2.5 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs ${
-                        selectedBook.rank === 'S'
+                      className={`text-white text-[11px] font-black px-2.5 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs ${selectedBook.rank === 'S'
                           ? 'bg-amber-500'
                           : selectedBook.rank === 'A'
-                          ? 'bg-indigo-500'
-                          : 'bg-gray-600'
-                      }`}
+                            ? 'bg-indigo-500'
+                            : 'bg-gray-600'
+                        }`}
                     >
                       <Sparkles className="w-3 h-3" /> RANK {selectedBook.rank}
                     </span>
@@ -273,11 +283,10 @@ export function BookBottomSheet({
 
               {/* 全画面表示時に展開される詳細 */}
               <div
-                className={`transition-all duration-300 overflow-hidden ${
-                  sheetState === 'full'
+                className={`transition-all duration-300 overflow-hidden ${sheetState === 'full'
                     ? 'max-h-[500px] opacity-100 mt-5 space-y-4'
                     : 'max-h-0 opacity-0'
-                }`}
+                  }`}
               >
                 <div>
                   <h4 className="text-xs font-bold text-gray-700 mb-1">あらすじ・概要</h4>
