@@ -7,8 +7,8 @@ import { QuickLinkCard } from "./_components/dashboard/QuickLinkCard";
 import { RecentBooksPanel } from "./_components/dashboard/RecentBooksPanel";
 import { PageFooter } from "./_components/layout/PageFooter";
 import { PageHeader } from "./_components/layout/PageHeader";
-import { StatCard } from "./_components/shared/StatCard";
-import { Badge } from "./_components/ui/Badge";
+import { StatCard } from "@/components/common/StatCard";
+import { Badge } from "@/components/ui/Badge";
 import {
   DASHBOARD_STATS,
   FREQUENT_SHOPS,

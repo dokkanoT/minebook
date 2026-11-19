@@ -8,15 +8,19 @@ type MiniDonutProps = {
 
 export function MiniDonut({ values, label }: MiniDonutProps) {
   const total = values.reduce((sum, v) => sum + v, 0) || 1;
-  let acc = 0;
   const stops = values
-    .map((v, i) => {
-      const start = (acc / total) * 360;
-      acc += v;
-      const end = (acc / total) * 360;
-      return `${SHADES[i % SHADES.length]} ${start}deg ${end}deg`;
-    })
-    .join(", ");
+    .reduce<{ end: number; stops: string[] }>(
+      (state, value, i) => {
+        const start = state.end;
+        const end = start + (value / total) * 360;
+        return {
+          end,
+          stops: [...state.stops, `${SHADES[i % SHADES.length]} ${start}deg ${end}deg`],
+        };
+      },
+      { end: 0, stops: [] },
+    )
+    .stops.join(", ");
 
   return (
     <div
