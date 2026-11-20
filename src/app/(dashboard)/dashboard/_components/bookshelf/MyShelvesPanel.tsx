@@ -1,16 +1,42 @@
 // src/app/(dashboard)/_components/bookshelf/MyShelvesPanel.tsx
+import { useState, type DragEventHandler } from "react";
+import { Archive, Plus } from "lucide-react";
 import { OutlineButton } from "@/components/ui/OutlineButton";
 import { Panel } from "@/components/ui/Panel";
 import { DropSlot } from "./DropSlot";
 import { ShelfCard, type ShelfView } from "./ShelfCard";
 
-export function MyShelvesPanel({ shelves }: { shelves: ShelfView[] }) {
+type MyShelvesPanelProps = {
+  shelves: ShelfView[];
+  onDropBook?: (shelfId: string, bookId: string) => void;
+  onDragStart?: DragEventHandler<HTMLElement>;
+  onDragEnd?: DragEventHandler<HTMLElement>;
+};
+
+export function MyShelvesPanel({
+  shelves,
+  onDropBook,
+  onDragStart,
+  onDragEnd,
+}: MyShelvesPanelProps) {
+  const [activeShelfId, setActiveShelfId] = useState<string | null>(null);
+
   return (
     <Panel
       title="マイ本棚"
-      description="本をドラッグして配置、棚内で並び替え"
-      action={<OutlineButton size="sm">＋ 本棚を作成</OutlineButton>}
+      description="本を置きたい棚へドラッグしてください"
+      action={
+        <OutlineButton size="sm" className="gap-1.5">
+          <Plus className="h-3.5 w-3.5" aria-hidden />
+          棚を作成
+        </OutlineButton>
+      }
+      className="shadow-sm"
     >
+      <div className="mb-4 flex items-center gap-2 rounded-md bg-neutral-100 px-3 py-2 text-xs text-neutral-600">
+        <Archive className="h-4 w-4 shrink-0 text-neutral-500" aria-hidden />
+        <span>棚の中の背表紙もドラッグして移動できます</span>
+      </div>
       <div className="space-y-4">
         {shelves.map((shelf) => {
           const empty = shelf.books.length === 0;
@@ -18,7 +44,23 @@ export function MyShelvesPanel({ shelves }: { shelves: ShelfView[] }) {
             <ShelfCard
               key={shelf.id}
               shelf={shelf}
+              highlight={activeShelfId === shelf.id}
               aside={empty ? <OutlineButton size="sm">削除</OutlineButton> : undefined}
+              onDragStart={onDragStart}
+              onDragEnd={onDragEnd}
+              onDragOver={(event) => {
+                if (!onDropBook) return;
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+                setActiveShelfId(shelf.id);
+              }}
+              onDragLeave={() => setActiveShelfId(null)}
+              onDrop={(event) => {
+                event.preventDefault();
+                const bookId = event.dataTransfer.getData("text/plain");
+                setActiveShelfId(null);
+                if (bookId) onDropBook?.(shelf.id, bookId);
+              }}
             >
               {empty && (
                 <DropSlot

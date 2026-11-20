@@ -1,7 +1,8 @@
 // src/app/(dashboard)/_components/bookshelf/BookPool.tsx
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type DragEventHandler } from "react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Panel } from "@/components/ui/Panel";
 import { BookTile, type TileBook } from "./BookTile";
@@ -16,13 +17,24 @@ type PlacementFilter = "all" | "unplaced" | "placed";
 type BookPoolProps = {
   books: PoolBook[];
   categories: readonly string[];
+  onDragStart?: DragEventHandler<HTMLElement>;
+  onDragEnd?: DragEventHandler<HTMLElement>;
+  onDropBook?: (bookId: string) => void;
+  dropActive?: boolean;
 };
 
 const FIELD_CLASS =
-  "h-9 rounded-sm border border-neutral-300 bg-white px-3 text-sm focus:border-neutral-500 focus:outline-none";
+  "h-10 rounded-md border border-neutral-300 bg-white px-3 text-sm transition-colors placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/10";
 
-export function BookPool({ books, categories }: BookPoolProps) {
-  const [placement, setPlacement] = useState<PlacementFilter>("all");
+export function BookPool({
+  books,
+  categories,
+  onDragStart,
+  onDragEnd,
+  onDropBook,
+  dropActive = false,
+}: BookPoolProps) {
+  const [placement, setPlacement] = useState<PlacementFilter>("unplaced");
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState("all");
 
@@ -55,10 +67,24 @@ export function BookPool({ books, categories }: BookPoolProps) {
     <Panel
       title="収集プール"
       action={
-        <p className="text-xs text-neutral-600">スキャン済みの本をここから棚へドラッグ</p>
+        <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-600">
+          未配置の本を整理
+        </span>
       }
+      className="shadow-sm"
     >
-      <div className="grid grid-cols-3 gap-2">
+      <div
+        onDragOver={(event) => {
+          if (onDropBook) event.preventDefault();
+        }}
+        onDrop={(event) => {
+          event.preventDefault();
+          const bookId = event.dataTransfer.getData("text/plain");
+          if (bookId) onDropBook?.(bookId);
+        }}
+        className={`rounded-md transition-colors ${dropActive ? "ring-2 ring-neutral-900 ring-offset-2" : ""}`}
+      >
+      <div className="grid grid-cols-3 gap-2 rounded-lg bg-neutral-100 p-1">
         {tabs.map((tab) => {
           const active = placement === tab.value;
           return (
@@ -67,8 +93,8 @@ export function BookPool({ books, categories }: BookPoolProps) {
               type="button"
               onClick={() => setPlacement(tab.value)}
               aria-pressed={active}
-              className={`rounded-sm border px-3 py-2 text-left ${
-                active ? "border-neutral-600 bg-neutral-200" : "border-neutral-300 bg-white hover:bg-neutral-50"
+              className={`rounded-md border px-3 py-2.5 text-left transition-all ${
+                active ? "border-neutral-900 bg-white text-neutral-900 shadow-sm" : "border-transparent bg-transparent text-neutral-600 hover:bg-white/80"
               }`}
             >
               <span className="block text-xs text-neutral-700">{tab.label}</span>
@@ -78,23 +104,25 @@ export function BookPool({ books, categories }: BookPoolProps) {
         })}
       </div>
 
-      <div className="mt-3 grid grid-cols-[minmax(0,1fr)_12rem] gap-2">
-        <label>
+      <div className="mt-4 grid gap-2 md:grid-cols-[minmax(0,1fr)_12rem]">
+        <label className="relative block">
           <span className="sr-only">タイトル・著者で検索</span>
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" aria-hidden />
           <input
             type="search"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             placeholder="タイトル・著者で検索"
-            className={`${FIELD_CLASS} w-full placeholder:text-neutral-500`}
+            className={`${FIELD_CLASS} w-full pl-9`}
           />
         </label>
-        <label>
+        <label className="relative block">
           <span className="sr-only">カテゴリで絞り込む</span>
+          <SlidersHorizontal className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" aria-hidden />
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className={`${FIELD_CLASS} w-full`}
+            className={`${FIELD_CLASS} w-full pl-9`}
           >
             <option value="all">カテゴリ：すべて</option>
             {categories.map((c) => (
@@ -109,12 +137,15 @@ export function BookPool({ books, categories }: BookPoolProps) {
       {filtered.length === 0 ? (
         <p className="py-12 text-center text-xs text-neutral-500">条件に一致する本はありません。</p>
       ) : (
-        <div className="mt-4 grid grid-cols-4 gap-3 2xl:grid-cols-6">
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 2xl:grid-cols-4">
           {filtered.map((book) => (
             <BookTile
               key={book.id}
               book={book}
               handle={!book.placed}
+              draggable={Boolean(!book.placed && onDragStart)}
+              onDragStart={onDragStart}
+              onDragEnd={onDragEnd}
               badge={
                 book.placed ? (
                   <Badge variant="muted">配置済み</Badge>
@@ -126,6 +157,7 @@ export function BookPool({ books, categories }: BookPoolProps) {
           ))}
         </div>
       )}
+      </div>
     </Panel>
   );
 }
