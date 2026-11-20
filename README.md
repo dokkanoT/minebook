@@ -89,7 +89,7 @@ Google ログインのボタン（仮実装） | `GoogleSignInButton` from `@/fe
 Server Component でユーザー取得 | `getCurrentUser` / `requireUser` from `@/features/auth/dal`
 Client Component から Supabase | `createClient` from `@/lib/supabase/client`
 
-- `/dashboard` `/collection` `/ranking` `/scan` `/bookshelf` は未ログインだと `/login?next=...` へリダイレクト（`src/proxy.ts`）
+- `/dashboard` 配下と `/scan` は未ログインだと `/login?next=...` へリダイレクト（`src/proxy.ts`）
 - フォームの name 属性: `email` / `password` / `displayName`（登録のみ）/ `next`（ログインのみ・hidden）
 - `src/features/auth/components/` のフォームは動作確認用の仮実装なので、各端末向けに差し替えてOK
 - Google ログインはブラウザから Supabase を直接呼ばず、必ず `signInWithGoogle` を使う。フォームに `next`（hidden）を入れると、ログイン後にそのページへ戻る
