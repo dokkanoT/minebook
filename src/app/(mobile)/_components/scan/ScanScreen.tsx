@@ -17,6 +17,9 @@ export interface ScanScreenProps {
   onOpenEvaluation?: (item: ScannedItem) => void;
   scannedList?: ScannedItem[];
   onScannedListChange?: (list: ScannedItem[]) => void;
+  onSearchIsbn?: (isbn: string) => void;
+  isSearching?: boolean;
+  searchError?: string | null;
 }
 
 export const DEFAULT_SCANNED_LIST: ScannedItem[] = [
@@ -45,10 +48,21 @@ export const ScanScreen = ({
   onOpenEvaluation,
   scannedList: externalScannedList,
   onScannedListChange,
+  onSearchIsbn,
+  isSearching,
+  searchError,
 }: ScanScreenProps) => {
+  const [isbnInput, setIsbnInput] = useState('');
   const [flashOn, setFlashOn] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [internalList, setInternalList] = useState<ScannedItem[]>(DEFAULT_SCANNED_LIST);
+  const handleIsbnSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = isbnInput.trim();
+    if (!trimmed || !onSearchIsbn || isSearching) return;
+    onSearchIsbn(trimmed);
+    setIsbnInput('');
+  };
 
   const scannedList = externalScannedList ?? internalList;
   const updateScannedList = (updater: (prev: ScannedItem[]) => ScannedItem[]) => {
@@ -75,7 +89,7 @@ export const ScanScreen = ({
         '新発掘！『羅生門』芥川龍之介',
       ];
       const randomTitle = candidates[Math.floor(Math.random() * candidates.length)];
-      
+
       const newBook: ScannedItem = {
         id: `scanned-${Date.now()}`,
         title: randomTitle,
@@ -94,7 +108,7 @@ export const ScanScreen = ({
 
   return (
     <div className="w-full flex-1 flex flex-col justify-between bg-white text-gray-900 min-h-0">
-      
+
       {/* ★ 確実にアニメーションを効かせるためのスタイル定義 */}
       <style>{`
         @keyframes slideInFromTopCustom {
@@ -117,7 +131,7 @@ export const ScanScreen = ({
 
       {/* 上部エリア */}
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
-        
+
         {/* ヘッダー（戻るボタンを廃止し、スッキリ中央配置） */}
         <header className="px-4 py-3.5 border-b border-gray-200 flex items-center justify-center bg-white shrink-0">
           <h1 className="text-base font-bold text-gray-900 tracking-tight">
@@ -126,7 +140,7 @@ export const ScanScreen = ({
         </header>
 
         <div className="p-5 flex-1 flex flex-col min-h-0">
-          
+
           {/* 指示テキスト（一般の人が迷わない親切なガイド） */}
           <div className="text-center mt-1 mb-3">
             <h2 className="text-sm font-bold text-gray-900">
@@ -149,9 +163,8 @@ export const ScanScreen = ({
                 handleSimulateScan();
               }
             }}
-            className={`w-full text-left bg-gray-200 border border-gray-300 rounded-xl p-3 cursor-pointer relative overflow-hidden transition-all shadow-inner touch-manipulation ${
-              flashOn ? 'bg-amber-100/70 ring-2 ring-amber-300' : ''
-            }`}
+            className={`w-full text-left bg-gray-200 border border-gray-300 rounded-xl p-3 cursor-pointer relative overflow-hidden transition-all shadow-inner touch-manipulation ${flashOn ? 'bg-amber-100/70 ring-2 ring-amber-300' : ''
+              }`}
           >
             {/* 右上の丸型フラッシュアイコンボタン */}
             <button
@@ -160,11 +173,10 @@ export const ScanScreen = ({
                 e.stopPropagation();
                 setFlashOn(!flashOn);
               }}
-              className={`absolute top-2.5 right-2.5 p-2 rounded-full transition-all active:scale-90 shadow-md z-10 flex items-center justify-center ${
-                flashOn
-                  ? 'bg-amber-400 text-stone-900 ring-2 ring-amber-300 shadow-amber-400/40'
-                  : 'bg-black/40 hover:bg-black/60 text-white backdrop-blur-xs'
-              }`}
+              className={`absolute top-2.5 right-2.5 p-2 rounded-full transition-all active:scale-90 shadow-md z-10 flex items-center justify-center ${flashOn
+                ? 'bg-amber-400 text-stone-900 ring-2 ring-amber-300 shadow-amber-400/40'
+                : 'bg-black/40 hover:bg-black/60 text-white backdrop-blur-xs'
+                }`}
               title={flashOn ? 'フラッシュをオフ' : 'フラッシュをオン'}
             >
               {flashOn ? (
@@ -181,7 +193,7 @@ export const ScanScreen = ({
 
             {/* スキャン枠 */}
             <div className="w-full bg-gray-150 border-2 border-black rounded-lg p-5 flex flex-col items-center justify-center relative shadow-sm min-h-[135px]">
-              
+
               {/* スキャン認識時の赤いレーザー */}
               {isScanning && (
                 <div className="absolute inset-x-2 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_8px_#f43f5e] animate-pulse" />
@@ -222,6 +234,64 @@ export const ScanScreen = ({
           <p className="text-xs text-gray-400 text-center mt-2.5">
             読み取れたら、自動で下部リストに追加されます。
           </p>
+          {/* ISBN手入力フォーム&テストボタン */}
+          <form onSubmit={handleIsbnSubmit} className="mt-3 flex gap-2">
+            <input
+              type="text"
+              value={isbnInput}
+              onChange={(e) => setIsbnInput(e.target.value)}
+              placeholder="ISBNを手入力"
+              disabled={isSearching}
+              className="flex-1 bg-gray-50 border border-gray-300
+                  focus:border-[#9E6219] focus:bg-white rounded-xl px-3
+                  py-2 text-xs font-medium text-gray-900 outline-none
+                  transition-all placeholder:text-gray-400"
+            />
+            <button
+              type="submit"
+              disabled={isSearching || !isbnInput.trim()}
+              className="bg-neutral-800 hover:bg-neutral-900
+                  disabled:bg-gray-300 text-white font-bold px-4 py-2
+                  rounded-xl text-xs transition-all active:scale-95
+                  shrink-0 cursor-pointer"
+            >
+              {isSearching ? '検索中...' : '検索'}
+            </button>
+
+          </form>
+          {searchError && (
+            <p className="text-[11px] text-rose-600 font-medium mt-1.5 px-1">
+              <span className="inline-block mr-1">⚠️</span>
+              {searchError}
+            </p>
+          )}
+          {/*テスト用ボタン*/}
+          <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] text-gray-400">※テスト用</span>
+            <button
+              type="button"
+              disabled={isSearching}
+              onClick={() =>
+                onSearchIsbn && onSearchIsbn('9784101010014')}
+              className="text-[10px] bg-amber-50 hover:bg-amber-100
+                  text-amber-800 border border-amber-200 px-2 py-0.5
+                  rounded-full cursor-pointer transition-colors"
+            >
+              人間失格
+            </button>
+            <button
+              type="button"
+              disabled={isSearching}
+              onClick={() =>
+                onSearchIsbn && onSearchIsbn('9784873115658')}
+              className="text-[10px] bg-amber-50 hover:bg-amber-100
+                  text-amber-800 border border-amber-200 px-2 py-0.5
+                  rounded-full cursor-pointer transition-colors"
+            >
+              リーダブルコード
+            </button>
+          </div>
+
 
           {/* 読取済みリストセクション */}
           <div className="mt-4 flex-1 flex flex-col min-h-0">
@@ -246,12 +316,11 @@ export const ScanScreen = ({
                     item.isNew
                       ? 'slide-down-active bg-amber-50 border-amber-300 ring-2 ring-amber-300/50'
                       : 'bg-gray-50/50 border-gray-300 hover:bg-gray-100/60'
-                  }`}
+                    }`}
                 >
                   {/* アイコン枠 */}
-                  <div className={`w-9 h-11 border rounded flex items-center justify-center shrink-0 ${
-                    item.isNew ? 'bg-amber-100 border-amber-300 text-amber-700' : 'bg-gray-200 border-gray-300 text-gray-500'
-                  }`}>
+                  <div className={`w-9 h-11 border rounded flex items-center justify-center shrink-0 ${item.isNew ? 'bg-amber-100 border-amber-300 text-amber-700' : 'bg-gray-200 border-gray-300 text-gray-500'
+                    }`}>
                     <div className="w-4 h-6 border border-current rounded-[2px] flex items-center justify-center">
                       <div className="w-2.5 h-0.5 bg-current" />
                     </div>
