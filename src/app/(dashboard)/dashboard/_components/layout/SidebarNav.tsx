@@ -12,7 +12,10 @@ export function SidebarNav() {
     <nav aria-label="メインメニュー">
       <ul className="space-y-1">
         {NAV_ITEMS.map(({ label, href }) => {
-          const active = pathname === href || pathname.startsWith(`${href}/`);
+          const active =
+            href === "/dashboard"
+              ? pathname === href
+              : pathname === href || pathname.startsWith(`${href}/`);
           return (
             <li key={href}>
               <Link
