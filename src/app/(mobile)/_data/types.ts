@@ -4,6 +4,7 @@ export type FlagType = 'none' | 'purchased' | 'pending' | 'skip';
 
 export interface BookItem {
   id: string;
+  collectionItemId?: string; // コレクションに登録済みのアイテムID（未登録の場合はundefined）
   title: string;
   author: string;
   scanDate: string;

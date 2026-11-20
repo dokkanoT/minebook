@@ -7,6 +7,7 @@ import {
   type ScannedItem,
 } from '../_components/scan/ScanScreen';
 import { lookupBook } from '@/features/books/actions';
+import { addToCollection, updateCollectionItem } from '@/features/collection/actions';
 import { BookBottomSheet } from '../_components/book/BookBottomSheet';
 import { INITIAL_BOOKS } from '../_data/mockData';
 import type { BookItem, FlagType, SheetState } from '../_data/types';
@@ -73,6 +74,46 @@ export default function MobileScanPage() {
       setIsSearching(false);
     }
   };
+  const syncBookToDatabase = async (book: BookItem, updates: { storePrice?: number; status?: FlagType },
+
+  ) => {
+    if (!/^97[89]\d{10}$/.test(book.isbn)) return;
+
+    const dbStatus = updates.status === undefined ? undefined : updates.status === 'none' ? null : updates.status;
+
+    if (book.collectionItemId) {
+      const res = await updateCollectionItem({
+        id: book.collectionItemId,
+        storePrice: updates.storePrice,
+        status: dbStatus
+      });
+      if (!res.ok) setSearchError(res.error);
+    } else {
+      const initialStatus = book.flag && book.flag !== 'none' ? book.flag : undefined;
+      const res = await addToCollection({
+
+        isbn: book.isbn,
+        storePrice:
+          updates.storePrice ?? (book.isEvaluated ? book.shopPrice : undefined),
+        status: dbStatus ?? initialStatus,
+      });
+      if (res.ok) {
+        const savedId = res.data.id;
+        setSelectedBook((prev) => prev && prev.id === book.id ? { ...prev, collectionItemId: savedId } : prev,
+        );
+        setBooksById((prev) => ({
+          ...prev,
+          [book.id]: {
+            ...(prev[book.id] ?? book),
+            collectionItemId: savedId
+          },
+
+        }));
+      } else {
+        setSearchError(res.error);
+      }
+    }
+  };
 
   const handleOpenEvaluation = (item: ScannedItem) => {
     // 該当するモック書籍を特定（なければ先頭のモックデータをベースに生成）
@@ -135,6 +176,7 @@ export default function MobileScanPage() {
           : item,
       ),
     );
+    void syncBookToDatabase(updatedBook, { storePrice: price })
   };
 
   const handleSetFlag = (flag: FlagType) => {
@@ -142,6 +184,7 @@ export default function MobileScanPage() {
     const updatedBook = { ...selectedBook, flag };
     setSelectedBook(updatedBook);
     setBooksById((prev) => ({ ...prev, [selectedBook.id]: updatedBook }));
+    void syncBookToDatabase(updatedBook, { status: flag });
 
   };
 
