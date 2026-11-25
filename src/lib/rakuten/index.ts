@@ -57,7 +57,8 @@ export async function fetchBookFromRakuten(
     outOfStockFlag: "1",
   });
   const res = await fetch(`${BOOKS_SEARCH_ENDPOINT}?${params}`, {
-    headers: { Referer: env.referer },
+    // Referer だけだと 403（REQUEST_CONTEXT_BODY_HTTP_REFERRER_MISSING）になるので Origin も送る
+    headers: { Referer: env.referer, Origin: new URL(env.referer).origin },
     signal: AbortSignal.timeout(5000),
   });
   if (res.status === 404) return null;
