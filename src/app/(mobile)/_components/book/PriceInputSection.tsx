@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { PenLine, Sparkles } from 'lucide-react';
+import { calcRank } from '../../_data/rank';
 
 interface PriceInputSectionProps {
   originalPrice: number;
@@ -20,6 +21,7 @@ export function PriceInputSection({
 }: PriceInputSectionProps) {
   const numericVal = parseInt(value, 10);
   const isValid = !isNaN(numericVal) && numericVal >= 0;
+  const previewRank = calcRank(originalPrice, numericVal);
 
   const quickPrices = [
     { label: '¥110', val: 110 },
@@ -58,11 +60,10 @@ export function PriceInputSection({
               key={item.label}
               type="button"
               onClick={() => onChange(String(item.val))}
-              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-all active:scale-95 border cursor-pointer ${
-                value === String(item.val)
-                  ? 'bg-[#9E6219] text-white border-[#9E6219] shadow-xs'
-                  : 'bg-[#FEF8F0] hover:bg-amber-100/70 text-[#9E6219] border-amber-200/80'
-              }`}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-all active:scale-95 border cursor-pointer ${value === String(item.val)
+                ? 'bg-[#9E6219] text-white border-[#9E6219] shadow-xs'
+                : 'bg-[#FEF8F0] hover:bg-amber-100/70 text-[#9E6219] border-amber-200/80'
+                }`}
             >
               {item.label}
             </button>
@@ -125,15 +126,15 @@ export function PriceInputSection({
                 お得額: +¥{(originalPrice - numericVal).toLocaleString()}
               </span>
               <span
-                className={`text-[10px] text-white px-1.5 py-0.2 rounded font-black ${
-                  (originalPrice - numericVal) / originalPrice >= 0.75
+                className={`text-[10px] text-white px-1.5 py-px rounded font-black ${
+                  previewRank === 'S'
                     ? 'bg-amber-500'
-                    : 'bg-indigo-500'
+                    : previewRank === 'A'
+                      ? 'bg-indigo-500'
+                      : 'bg-gray-600'
                 }`}
               >
-                {(originalPrice - numericVal) / originalPrice >= 0.75
-                  ? 'RANK S'
-                  : 'RANK A'}
+                RANK {previewRank}
               </span>
             </>
           ) : (

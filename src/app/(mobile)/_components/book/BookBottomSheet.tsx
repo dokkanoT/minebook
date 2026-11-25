@@ -38,6 +38,13 @@ export function BookBottomSheet({
   const [priceInputValue, setPriceInputValue] = useState('');
   const [justEvaluated, setJustEvaluated] = useState(false);
 
+  // ×ボタン・背景タップ・スワイプのどれで閉じても、次の本に入力内容を持ち越さない
+  if (sheetState === 'closed' && (isInputtingPrice || priceInputValue || justEvaluated)) {
+    setIsInputtingPrice(false);
+    setPriceInputValue('');
+    setJustEvaluated(false);
+  }
+
   // ドラッグ操作用
   const dragStartY = useRef<number | null>(null);
   const isDragging = useRef<boolean>(false);
@@ -252,7 +259,7 @@ export function BookBottomSheet({
                     >
                       <PenLine className="w-3.5 h-3.5 text-[#9A6218]" />
                       <span>店頭価格 未入力</span>
-                      <span className="text-[10px] bg-[#9A6218] text-white px-1.5 py-0.2 rounded font-normal">
+                      <span className="text-[10px] bg-[#9A6218] text-white px-1.5 py-px rounded font-normal">
                         入力する
                       </span>
                     </button>

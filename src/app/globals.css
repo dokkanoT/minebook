@@ -10,6 +10,9 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  /* Tailwind 標準の gray にはない中間色 */
+  --color-gray-150: oklch(94.8% 0.0045 264.5);
+  --color-gray-250: oklch(90% 0.008 261.4);
 }
 
 @media (prefers-color-scheme: dark) {

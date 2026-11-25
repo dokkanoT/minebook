@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { BookOpen, Sparkles, CheckCircle2, Bookmark, ShoppingCart, PenLine } from 'lucide-react';
+import { calcRank } from '../../_data/rank';
 import type { BookItem, FlagType } from '../../_data/types';
 import { PriceInputSection } from './PriceInputSection';
 import { FlagDropdown } from './FlagDropdown';
@@ -75,23 +76,11 @@ export const BookDetailView = ({
 
   // お宝度判定の実行
   const handleExecuteEvaluation = (price: number) => {
-    const original = currentBook.originalPrice;
-    const discountRate = (original - price) / original;
-
-    let rank: 'S' | 'A' | 'B' = 'B';
-    if (discountRate >= 0.75) {
-      rank = 'S';
-    } else if (discountRate >= 0.50) {
-      rank = 'A';
-    } else {
-      rank = 'B';
-    }
-
     const updated: BookItem = {
       ...currentBook,
       isEvaluated: true,
       shopPrice: price,
-      rank,
+      rank: calcRank(currentBook.originalPrice, price),
     };
 
     setCurrentBook(updated);
@@ -206,7 +195,7 @@ export const BookDetailView = ({
               >
                 <PenLine className="w-3.5 h-3.5 text-[#9A6218]" />
                 <span>店頭価格 未入力</span>
-                <span className="text-[10px] bg-[#9A6218] text-white px-1.5 py-0.2 rounded font-normal">
+                <span className="text-[10px] bg-[#9A6218] text-white px-1.5 py-px rounded font-normal">
                   入力する
                 </span>
               </button>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { HomeView } from '../_components/home/HomeView';
 import { BookBottomSheet } from '../_components/book/BookBottomSheet';
 import { INITIAL_BOOKS } from '../_data/mockData';
+import { calcRank } from '../_data/rank';
 import type { BookItem, FlagType, SheetState } from '../_data/types';
 
 export default function MobileHomePage() {
@@ -21,23 +22,11 @@ export default function MobileHomePage() {
   const handleExecuteEvaluation = (price: number) => {
     if (!selectedBook) return;
 
-    const original = selectedBook.originalPrice;
-    const discountRate = (original - price) / original;
-
-    let rank: 'S' | 'A' | 'B' = 'B';
-    if (discountRate >= 0.75) {
-      rank = 'S';
-    } else if (discountRate >= 0.5) {
-      rank = 'A';
-    } else {
-      rank = 'B';
-    }
-
     const updatedBook: BookItem = {
       ...selectedBook,
       isEvaluated: true,
       shopPrice: price,
-      rank,
+      rank: calcRank(selectedBook.originalPrice, price),
     };
 
     setSelectedBook(updatedBook);
