@@ -38,6 +38,13 @@ export function BookBottomSheet({
   const [priceInputValue, setPriceInputValue] = useState('');
   const [justEvaluated, setJustEvaluated] = useState(false);
 
+  // ×ボタン・背景タップ・スワイプのどれで閉じても、次の本に入力内容を持ち越さない
+  if (sheetState === 'closed' && (isInputtingPrice || priceInputValue || justEvaluated)) {
+    setIsInputtingPrice(false);
+    setPriceInputValue('');
+    setJustEvaluated(false);
+  }
+
   // ドラッグ操作用
   const dragStartY = useRef<number | null>(null);
   const isDragging = useRef<boolean>(false);
