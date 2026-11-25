@@ -8,6 +8,7 @@ import {
 } from '../_components/scan/ScanScreen';
 import { BookBottomSheet } from '../_components/book/BookBottomSheet';
 import { INITIAL_BOOKS } from '../_data/mockData';
+import { calcRank } from '../_data/rank';
 import type { BookItem, FlagType, SheetState } from '../_data/types';
 
 export default function MobileScanPage() {
@@ -40,17 +41,7 @@ export default function MobileScanPage() {
   const handleExecuteEvaluation = (price: number) => {
     if (!selectedBook) return;
 
-    const original = selectedBook.originalPrice;
-    const discountRate = (original - price) / original;
-
-    let rank: 'S' | 'A' | 'B' = 'B';
-    if (discountRate >= 0.75) {
-      rank = 'S';
-    } else if (discountRate >= 0.5) {
-      rank = 'A';
-    } else {
-      rank = 'B';
-    }
+    const rank = calcRank(selectedBook.originalPrice, price);
 
     const updatedBook: BookItem = {
       ...selectedBook,

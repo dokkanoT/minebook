@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { BookOpen, Sparkles, CheckCircle2, Bookmark, ShoppingCart, PenLine } from 'lucide-react';
+import { calcRank } from '../../_data/rank';
 import type { BookItem, FlagType } from '../../_data/types';
 import { PriceInputSection } from './PriceInputSection';
 import { FlagDropdown } from './FlagDropdown';
@@ -75,23 +76,11 @@ export const BookDetailView = ({
 
   // お宝度判定の実行
   const handleExecuteEvaluation = (price: number) => {
-    const original = currentBook.originalPrice;
-    const discountRate = (original - price) / original;
-
-    let rank: 'S' | 'A' | 'B' = 'B';
-    if (discountRate >= 0.75) {
-      rank = 'S';
-    } else if (discountRate >= 0.50) {
-      rank = 'A';
-    } else {
-      rank = 'B';
-    }
-
     const updated: BookItem = {
       ...currentBook,
       isEvaluated: true,
       shopPrice: price,
-      rank,
+      rank: calcRank(currentBook.originalPrice, price),
     };
 
     setCurrentBook(updated);
