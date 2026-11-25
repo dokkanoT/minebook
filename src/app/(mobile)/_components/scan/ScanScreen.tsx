@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronRight, Zap, ZapOff, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ChevronRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CameraPreview } from './CameraPreview';
 
 export interface ScannedItem {
   id: string;
@@ -17,6 +18,8 @@ export interface ScanScreenProps {
   onOpenEvaluation?: (item: ScannedItem) => void;
   scannedList?: ScannedItem[];
   onScannedListChange?: (list: ScannedItem[]) => void;
+  onSearchIsbn?: (isbn: string) => Promise<boolean | void> | boolean | void;
+  isSearching?: boolean;
 }
 
 export const DEFAULT_SCANNED_LIST: ScannedItem[] = [
@@ -45,9 +48,9 @@ export const ScanScreen = ({
   onOpenEvaluation,
   scannedList: externalScannedList,
   onScannedListChange,
+  onSearchIsbn,
+  isSearching = false,
 }: ScanScreenProps) => {
-  const [flashOn, setFlashOn] = useState(false);
-  const [isScanning, setIsScanning] = useState(false);
   const [internalList, setInternalList] = useState<ScannedItem[]>(DEFAULT_SCANNED_LIST);
 
   const scannedList = externalScannedList ?? internalList;
@@ -61,35 +64,28 @@ export const ScanScreen = ({
 
   const unevaluatedCount = scannedList.filter((item) => !item.isEvaluated).length;
 
-  // カメラ枠クリック時の自動認識シミュレーション
-  const handleSimulateScan = () => {
-    if (isScanning) return;
-    setIsScanning(true);
+  // カメラで ISBN を読み取ったとき
+  const handleDetectIsbn = (isbn: string) => {
+    if (isSearching) return;
+    navigator.vibrate?.(50); // 読み取れたことを手に伝える（Android のみ）
 
-    setTimeout(() => {
-      const candidates = [
-        '新発掘！『銀河鉄道の夜』宮沢賢治',
-        '新発掘！『こころ』夏目漱石',
-        '新発掘！『人間失格』太宰治',
-        '新発掘！『注文の多い料理店』',
-        '新発掘！『羅生門』芥川龍之介',
-      ];
-      const randomTitle = candidates[Math.floor(Math.random() * candidates.length)];
-      
-      const newBook: ScannedItem = {
-        id: `scanned-${Date.now()}`,
-        title: randomTitle,
-        statusText: '未評価・店頭価格未入力',
-        isEvaluated: false,
-        isNew: true, // ★ 新規追加フラグ
-      };
+    if (onSearchIsbn) {
+      void onSearchIsbn(isbn);
+      return;
+    }
 
-      updateScannedList((prev) => [
-        newBook,
-        ...prev.map((b) => ({ ...b, isNew: false })),
-      ]);
-      setIsScanning(false);
-    }, 400);
+    // ISBN 検索につながるまでの仮表示
+    const newBook: ScannedItem = {
+      id: `scanned-${Date.now()}`,
+      title: `ISBN ${isbn}`,
+      statusText: '未評価・店頭価格未入力',
+      isEvaluated: false,
+      isNew: true, // ★ 新規追加フラグ
+    };
+    updateScannedList((prev) => [
+      newBook,
+      ...prev.map((b) => ({ ...b, isNew: false })),
+    ]);
   };
 
   return (
@@ -140,78 +136,13 @@ export const ScanScreen = ({
           </div>
 
           {/* カメラプレビュー領域 */}
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={handleSimulateScan}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                handleSimulateScan();
-              }
-            }}
-            className={`w-full text-left bg-gray-200 border border-gray-300 rounded-xl p-3 cursor-pointer relative overflow-hidden transition-all shadow-inner touch-manipulation ${
-              flashOn ? 'bg-amber-100/70 ring-2 ring-amber-300' : ''
-            }`}
-          >
-            {/* 右上の丸型フラッシュアイコンボタン */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setFlashOn(!flashOn);
-              }}
-              className={`absolute top-2.5 right-2.5 p-2 rounded-full transition-all active:scale-90 shadow-md z-10 flex items-center justify-center ${
-                flashOn
-                  ? 'bg-amber-400 text-stone-900 ring-2 ring-amber-300 shadow-amber-400/40'
-                  : 'bg-black/40 hover:bg-black/60 text-white backdrop-blur-xs'
-              }`}
-              title={flashOn ? 'フラッシュをオフ' : 'フラッシュをオン'}
-            >
-              {flashOn ? (
-                <Zap className="w-4 h-4 fill-current" />
-              ) : (
-                <ZapOff className="w-4 h-4 text-white/90" />
-              )}
-            </button>
-
-            {/* 上部ラベル */}
-            <p className="text-[11px] text-gray-500 mb-2 font-medium">
-              カメラプレビュー（仮）
-            </p>
-
-            {/* スキャン枠 */}
-            <div className="w-full bg-gray-150 border-2 border-black rounded-lg p-5 flex flex-col items-center justify-center relative shadow-sm min-h-[135px]">
-              
-              {/* スキャン認識時の赤いレーザー */}
-              {isScanning && (
-                <div className="absolute inset-x-2 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_8px_#f43f5e] animate-pulse" />
-              )}
-
-              {/* バーコードのSVGイラスト ＆ 978〜番号ガイド */}
-              <div className="flex flex-col items-center mb-1.5">
-                <span className="text-[9px] font-mono tracking-widest text-gray-500 mb-0.5">
-                  978-4-XXXXXXXX-X
-                </span>
-                <div className="flex items-center gap-[2.5px] h-10 px-2">
-                  {[3, 1, 4, 1, 2, 4, 1, 3, 2, 1, 4, 2, 1, 3, 1, 2, 4, 1, 3, 2, 4, 1, 2].map((w, i) => (
-                    <div
-                      key={i}
-                      className="h-full bg-gray-700"
-                      style={{ width: `${w * 1.5}px` }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <p className="text-[11px] text-gray-700 font-bold">
-                上段バーコード（978〜）
-              </p>
-            </div>
+          <div className="w-full bg-gray-200 border border-gray-300 rounded-xl p-3 relative overflow-hidden shadow-inner">
+            <CameraPreview onDetect={handleDetectIsbn} busy={isSearching} />
 
             {/* 下部ステータス */}
             <p className="text-[11px] text-gray-500 mt-2 text-center">
-              {isScanning ? (
-                <span className="text-rose-600 font-bold animate-pulse">読み取り中...</span>
+              {isSearching ? (
+                <span className="text-rose-600 font-bold animate-pulse">検索中...</span>
               ) : (
                 '読み取り待ち…'
               )}
