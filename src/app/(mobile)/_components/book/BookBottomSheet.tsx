@@ -44,12 +44,17 @@ export function BookBottomSheet({
 
   const evalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 別の本に切り替わったときは前回の入力・バナー状態をリセットする
-  if (prevBookId !== selectedBook?.id) {
-    setPrevBookId(selectedBook?.id);
-    setIsInputtingPrice(false);
-    setPriceInputValue('');
-    setJustEvaluated(false);
+  // 別の本に切り替わったとき、またはシートが閉じられたときは前回の入力・バナー状態をリセットする
+  if (
+    prevBookId !== selectedBook?.id ||
+    (sheetState === 'closed' && (isInputtingPrice || priceInputValue || justEvaluated))
+  ) {
+    if (prevBookId !== selectedBook?.id) {
+      setPrevBookId(selectedBook?.id);
+    }
+    if (isInputtingPrice) setIsInputtingPrice(false);
+    if (priceInputValue) setPriceInputValue('');
+    if (justEvaluated) setJustEvaluated(false);
   }
 
   // ドラッグ操作用

@@ -1,4 +1,6 @@
-export type BookRank = 'S' | 'A' | 'B';
+import { calcRank, type Rank } from './rank';
+
+export type BookRank = Rank;
 
 export interface PriceEvaluationResult {
   rank: BookRank;
@@ -9,33 +11,27 @@ export interface PriceEvaluationResult {
 }
 
 /**
- * 定価と店頭価格から仮のお宝ランクと割引率を計算する
+ * 定価と店頭価格からランク（mainのcalcRank準拠）と割引率を計算する
  */
 export function evaluateBookPrice(
   originalPrice: number,
   shopPrice: number,
 ): PriceEvaluationResult {
-  if (originalPrice <= 0) {
+  const rank = calcRank(originalPrice, shopPrice);
+
+  if (originalPrice <= 0 || shopPrice >= originalPrice) {
     return {
-      rank: 'B',
+      rank,
       discountPercent: null,
       savings: null,
     };
   }
 
   const discountRate = (originalPrice - shopPrice) / originalPrice;
-  let rank: BookRank = 'B';
-  if (discountRate >= 0.75) {
-    rank = 'S';
-  } else if (discountRate >= 0.5) {
-    rank = 'A';
-  }
-
-  const isDiscounted = shopPrice < originalPrice;
   return {
     rank,
-    discountPercent: isDiscounted ? Math.round(discountRate * 100) : null,
-    savings: isDiscounted ? originalPrice - shopPrice : null,
+    discountPercent: Math.round(discountRate * 100),
+    savings: originalPrice - shopPrice,
   };
 }
 

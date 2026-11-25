@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { BookOpen, ChevronRight, Clock, ShoppingCart, Ban } from 'lucide-react';
+import { SignOutButton } from '@/features/auth/components/SignOutButton';
 import type { BookItem, FlagType } from '../../_data/types';
 import { BookCover } from '../book/BookCover';
 
@@ -43,6 +44,9 @@ export function HomeView({ books, onBookClick, onStartScan }: HomeViewProps) {
       <header className="px-5 py-4 border-b border-gray-200 flex items-center gap-2.5 bg-white shrink-0">
         <BookOpen className="w-6 h-6 stroke-[2.2]" />
         <h1 className="text-xl font-bold tracking-tight">MineBook</h1>
+        <div className="ml-auto">
+          <SignOutButton />
+        </div>
       </header>
 
       <div className="p-5 flex-1 flex flex-col min-h-0">

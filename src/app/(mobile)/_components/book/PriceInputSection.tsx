@@ -67,11 +67,10 @@ export function PriceInputSection({
               key={item.label}
               type="button"
               onClick={() => onChange(String(item.val))}
-              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-all active:scale-95 border cursor-pointer ${
-                value === String(item.val)
-                  ? 'bg-[#9E6219] text-white border-[#9E6219] shadow-xs'
-                  : 'bg-[#FEF8F0] hover:bg-amber-100/70 text-[#9E6219] border-amber-200/80'
-              }`}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-all active:scale-95 border cursor-pointer ${value === String(item.val)
+                ? 'bg-[#9E6219] text-white border-[#9E6219] shadow-xs'
+                : 'bg-[#FEF8F0] hover:bg-amber-100/70 text-[#9E6219] border-amber-200/80'
+                }`}
             >
               {item.label}
             </button>
@@ -132,7 +131,14 @@ export function PriceInputSection({
       {isValid && preview && (
         <div className="text-center text-xs font-bold py-1.5 px-2 rounded-lg bg-[#FEF8F0] text-[#9E6219] border border-amber-200/80 flex items-center justify-center gap-2">
           {originalPrice <= 0 ? (
-            <span>定価情報なし（店頭価格 ¥{numericVal.toLocaleString()} を記録）</span>
+            <>
+              <span>定価情報なし（店頭価格 ¥{numericVal.toLocaleString()} を記録）</span>
+              <span
+                className={`text-[10px] text-white px-1.5 py-0.5 rounded font-black ${RANK_BADGE_BG[preview.rank]}`}
+              >
+                RANK {preview.rank}
+              </span>
+            </>
           ) : preview.discountPercent !== null && preview.savings !== null ? (
             <>
               <span>{preview.discountPercent}% OFF</span>
