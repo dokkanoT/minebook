@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { PenLine, Sparkles } from 'lucide-react';
+import { evaluateBookPrice, RANK_BADGE_BG } from '../../_data/bookEvaluation';
 
 interface PriceInputSectionProps {
   originalPrice: number;
@@ -19,7 +20,7 @@ export function PriceInputSection({
   onEvaluate,
 }: PriceInputSectionProps) {
   const numericVal = parseInt(value, 10);
-  const isValid = !isNaN(numericVal) && numericVal >= 0;
+  const isValid = !Number.isNaN(numericVal) && numericVal >= 0;
 
   const quickPrices = [
     { label: '¥110', val: 110 },
@@ -27,11 +28,19 @@ export function PriceInputSection({
     { label: '¥330', val: 330 },
     { label: '¥440', val: 440 },
     { label: '¥550', val: 550 },
-    {
-      label: `半額 ¥${Math.round(originalPrice / 2).toLocaleString()}`,
-      val: Math.round(originalPrice / 2),
-    },
+    ...(originalPrice > 0
+      ? [
+          {
+            label: `半額 ¥${Math.round(originalPrice / 2).toLocaleString()}`,
+            val: Math.round(originalPrice / 2),
+          },
+        ]
+      : []),
   ];
+
+  const preview = isValid
+    ? evaluateBookPrice(originalPrice, numericVal)
+    : null;
 
   return (
     <div className="space-y-2.5 animate-slide-down">
@@ -79,12 +88,19 @@ export function PriceInputSection({
           <input
             type="number"
             inputMode="numeric"
+            enterKeyHint="done"
             pattern="[0-9]*"
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && isValid) {
+                e.preventDefault();
+                onEvaluate(numericVal);
+              }
+            }}
             placeholder="金額を入力"
             autoFocus
-            className="w-full bg-gray-50 border-2 border-gray-250 focus:border-[#9E6219] focus:bg-white rounded-xl py-2 pl-7 pr-7 text-base font-bold text-gray-900 outline-none transition-all"
+            className="w-full bg-gray-50 border-2 border-gray-300 focus:border-[#9E6219] focus:bg-white rounded-xl py-2 pl-7 pr-7 text-base font-bold text-gray-900 outline-none transition-all"
           />
           {value && (
             <button
@@ -113,27 +129,19 @@ export function PriceInputSection({
       </div>
 
       {/* リアルタイムお宝度プレビュー */}
-      {isValid && (
+      {isValid && preview && (
         <div className="text-center text-xs font-bold py-1.5 px-2 rounded-lg bg-[#FEF8F0] text-[#9E6219] border border-amber-200/80 flex items-center justify-center gap-2">
-          {numericVal < originalPrice ? (
+          {originalPrice <= 0 ? (
+            <span>定価情報なし（店頭価格 ¥{numericVal.toLocaleString()} を記録）</span>
+          ) : preview.discountPercent !== null && preview.savings !== null ? (
             <>
-              <span>
-                {Math.round((1 - numericVal / originalPrice) * 100)}% OFF
-              </span>
+              <span>{preview.discountPercent}% OFF</span>
               <span>・</span>
-              <span>
-                お得額: +¥{(originalPrice - numericVal).toLocaleString()}
-              </span>
+              <span>お得額: +¥{preview.savings.toLocaleString()}</span>
               <span
-                className={`text-[10px] text-white px-1.5 py-0.2 rounded font-black ${
-                  (originalPrice - numericVal) / originalPrice >= 0.75
-                    ? 'bg-amber-500'
-                    : 'bg-indigo-500'
-                }`}
+                className={`text-[10px] text-white px-1.5 py-0.5 rounded font-black ${RANK_BADGE_BG[preview.rank]}`}
               >
-                {(originalPrice - numericVal) / originalPrice >= 0.75
-                  ? 'RANK S'
-                  : 'RANK A'}
+                RANK {preview.rank}
               </span>
             </>
           ) : (

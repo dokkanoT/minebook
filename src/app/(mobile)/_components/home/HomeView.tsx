@@ -3,6 +3,7 @@
 import React from 'react';
 import { BookOpen, ChevronRight, Clock, ShoppingCart, Ban } from 'lucide-react';
 import type { BookItem, FlagType } from '../../_data/types';
+import { BookCover } from '../book/BookCover';
 
 interface HomeViewProps {
   books: BookItem[];
@@ -27,7 +28,7 @@ export function HomeView({ books, onBookClick, onStartScan }: HomeViewProps) {
         );
       case 'skip':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-gray-600 bg-gray-150 px-2 py-0.5 rounded-full border border-gray-300">
+          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-300">
             <Ban className="w-3 h-3" /> 見送り
           </span>
         );
@@ -77,12 +78,13 @@ export function HomeView({ books, onBookClick, onStartScan }: HomeViewProps) {
                 key={book.id}
                 type="button"
                 onClick={() => onBookClick(book)}
-                className="w-full text-left border border-gray-250 rounded-xl p-3 bg-gray-50/60 hover:bg-gray-100/60 active:bg-gray-150 cursor-pointer active:scale-[0.99] transition-all flex items-center gap-3.5 shadow-sm touch-manipulation"
+                className="w-full text-left border border-gray-200 rounded-xl p-3 bg-gray-50/60 hover:bg-gray-100/60 active:bg-gray-100 cursor-pointer active:scale-[0.99] transition-all flex items-center gap-3.5 shadow-sm touch-manipulation"
               >
-                <div className="w-12 h-16 bg-gray-200/90 border border-gray-300 rounded flex flex-col items-center justify-center text-gray-400 shrink-0">
-                  <BookOpen className="w-4 h-4 stroke-1 mb-0.5" />
-                  <span className="text-[9px]">書影</span>
-                </div>
+                <BookCover
+                  coverUrl={book.coverUrl}
+                  title={book.title}
+                  size="md"
+                />
 
                 <div className="flex-1 min-w-0">
                   <h4 className="font-bold text-xs text-gray-900 truncate">
@@ -97,7 +99,7 @@ export function HomeView({ books, onBookClick, onStartScan }: HomeViewProps) {
                       {book.scanDate}
                     </span>
                     {!book.isEvaluated && (
-                      <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-800 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
+                      <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
                         <Clock className="w-2.5 h-2.5 text-amber-600" /> 未評価
                       </span>
                     )}

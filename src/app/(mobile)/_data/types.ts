@@ -2,9 +2,21 @@ export type SheetState = 'closed' | 'half' | 'full';
 export type TabType = 'home' | 'scan';
 export type FlagType = 'none' | 'purchased' | 'pending' | 'skip';
 
+export interface ScannedItem {
+  id: string;
+  title: string;
+  coverUrl?: string;
+  statusText: string;
+  isEvaluated: boolean;
+  isMock?: boolean;
+  rank?: 'S' | 'A' | 'B';
+  isNew?: boolean;
+}
+
 export interface BookItem {
   id: string;
   collectionItemId?: string; // コレクションに登録済みのアイテムID（未登録の場合はundefined）
+  isMock?: boolean;          // 仮データ由来の書籍かどうか（DB保存対象外）
   title: string;
   author: string;
   scanDate: string;

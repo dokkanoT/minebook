@@ -15,7 +15,7 @@ export default function LoginPage({
 }) {
   return (
     <main className="min-h-screen w-full bg-neutral-100 flex flex-col justify-center items-center p-4 sm:p-6">
-      <div className="w-full max-w-[420px] bg-white rounded-3xl shadow-xl border border-gray-200 p-6 sm:p-8 flex flex-col">
+      <div className="w-full max-w-[420px] bg-white text-gray-900 rounded-3xl shadow-xl border border-gray-200 p-6 sm:p-8 flex flex-col">
         {/* ロゴ & ヘッダー */}
         <div className="text-center mb-6">
           <div className="w-12 h-12 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-center mx-auto mb-3 text-[#9E6219]">
@@ -41,7 +41,7 @@ export default function LoginPage({
         </Suspense>
 
         {/* 新規登録案内 */}
-        <div className="mt-6 pt-5 border-t border-gray-150 text-center text-xs text-gray-500">
+        <div className="mt-6 pt-5 border-t border-gray-200 text-center text-xs text-gray-500">
           アカウントをお持ちでないですか？{" "}
           <Link
             href="/register"
