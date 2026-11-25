@@ -6,7 +6,17 @@ export type ShelfView = {
   id: string;
   name: string;
   books: TileBook[];
+  color?: "slate" | "rose" | "amber" | "emerald" | "sky" | "violet";
 };
+
+const SHELF_COLOR_CLASS = {
+  slate: "bg-slate-500",
+  rose: "bg-rose-500",
+  amber: "bg-amber-500",
+  emerald: "bg-emerald-500",
+  sky: "bg-sky-500",
+  violet: "bg-violet-500",
+} as const;
 
 type ShelfCardProps = {
   shelf: ShelfView;
@@ -23,6 +33,8 @@ type ShelfCardProps = {
   onDrop?: DragEventHandler<HTMLElement>;
   onDragStart?: DragEventHandler<HTMLElement>;
   onDragEnd?: DragEventHandler<HTMLElement>;
+  draggingBookId?: string | null;
+  onBookClick?: (book: TileBook) => void;
 };
 
 export function ShelfCard({
@@ -37,6 +49,8 @@ export function ShelfCard({
   onDrop,
   onDragStart,
   onDragEnd,
+  draggingBookId = null,
+  onBookClick,
 }: ShelfCardProps) {
   return (
     <section
@@ -50,30 +64,41 @@ export function ShelfCard({
       onDrop={onDrop}
     >
       <header className="mb-4 flex items-center justify-between gap-2">
-        <div className="flex items-baseline gap-2">
-          <h3 className="text-sm font-bold tracking-tight">{shelf.name}</h3>
-          <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-600">{shelf.books.length}冊</span>
+        <div className="min-w-0">
+          <h3 className="flex items-center gap-2 truncate text-sm font-bold tracking-tight">
+            <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${SHELF_COLOR_CLASS[shelf.color ?? "slate"]}`} aria-hidden />
+            {shelf.name}
+          </h3>
+          <p className="mt-0.5 text-[10px] text-neutral-500">
+            {shelf.books.length}冊 ・ 平均お宝度 {shelf.books.length
+              ? (shelf.books.reduce((sum, book) => sum + book.score, 0) / shelf.books.length).toFixed(1)
+              : "—"}
+          </p>
         </div>
         {aside}
       </header>
 
-      {shelf.books.length > 0 && (
-        <div className="relative flex min-h-40 items-end gap-2 overflow-x-auto rounded-md border border-neutral-200 bg-gradient-to-b from-neutral-100 to-neutral-200 p-4 shadow-inner">
-          <div className="absolute inset-x-3 bottom-2 h-1 rounded-full bg-neutral-800/80" aria-hidden />
-          {shelf.books.map((book) => (
+      <div className="relative flex min-h-48 items-end gap-1.5 overflow-x-auto rounded-sm border border-neutral-300 bg-neutral-200 px-3 pb-3 pt-4 shadow-inner">
+        <div className="absolute inset-x-0 bottom-0 h-2 bg-neutral-800 shadow-[0_-1px_2px_rgba(0,0,0,0.12)]" aria-hidden />
+        {shelf.books.map((book) => (
+          <div key={book.id} className="relative z-10 flex shrink-0 flex-col items-center">
             <BookTile
-              key={book.id}
               book={book}
               cover={tileCover}
               variant="spine"
+              state={draggingBookId === book.id ? "dragging" : "default"}
               handle
               draggable={Boolean(onDragStart)}
               onDragStart={onDragStart}
               onDragEnd={onDragEnd}
+              onSelect={onBookClick}
             />
-          ))}
-        </div>
-      )}
+          </div>
+        ))}
+        {shelf.books.length === 0 && (
+          <p className="mb-5 w-full text-center text-xs text-neutral-500">本をドラッグして棚に置く</p>
+        )}
+      </div>
 
       {children}
       {footer}

@@ -29,13 +29,14 @@ type BookTileProps = {
   book: TileBook;
   state?: TileState;
   cover?: CoverSize;
-  variant?: "card" | "spine";
+  variant?: "card" | "spine" | "row";
   badge?: ReactNode;
   /** つまめることを示すグリップを表示する */
   handle?: boolean;
   draggable?: boolean;
   onDragStart?: DragEventHandler<HTMLElement>;
   onDragEnd?: DragEventHandler<HTMLElement>;
+  onSelect?: (book: TileBook) => void;
 };
 
 export function BookTile({
@@ -48,6 +49,7 @@ export function BookTile({
   draggable = false,
   onDragStart,
   onDragEnd,
+  onSelect,
 }: BookTileProps) {
   const dragProps = {
     draggable,
@@ -58,18 +60,47 @@ export function BookTile({
 
   if (variant === "spine") {
     return (
-      <article
+      <button
         {...dragProps}
+        type="button"
         aria-label={`${book.title}、${book.author}、${book.category}、お宝度${book.score}`}
-        className={`relative flex h-36 w-12 shrink-0 flex-col items-center justify-between rounded-t-sm border px-1.5 py-2 shadow-sm transition-transform ${
-          state === "dragging" ? "-rotate-2 border-2 border-neutral-900" : "border-neutral-400"
-        } bg-neutral-700 text-white transition-all hover:-translate-y-1 hover:shadow-md ${handle ? "cursor-grab select-none" : ""}`}
+        aria-grabbed={state === "dragging"}
+        onClick={() => onSelect?.(book)}
+        className={`relative flex h-36 w-12 shrink-0 flex-col items-center justify-between rounded-t-sm border bg-neutral-700 px-1.5 py-2 text-white transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2 ${
+          state === "dragging"
+            ? "pointer-events-none opacity-0"
+            : "border-neutral-400 shadow-sm hover:-translate-y-1 hover:shadow-md"
+        } ${handle ? `${state === "dragging" ? "cursor-grabbing" : "cursor-grab"} select-none` : ""}`}
       >
         {handle && <GripVertical className="absolute right-0.5 top-0.5 h-3 w-3 text-neutral-300" aria-hidden />}
         <h3 className="max-h-24 overflow-hidden text-[11px] font-bold leading-tight" style={{ writingMode: "vertical-rl" }}>
           {book.title}
         </h3>
         <span className="text-[10px] font-bold text-neutral-200">{book.score}</span>
+      </button>
+    );
+  }
+
+  if (variant === "row") {
+    return (
+      <article
+        {...dragProps}
+        aria-label={`${book.title}、${book.author}、${book.category}、お宝度${book.score}`}
+        aria-grabbed={false}
+        className={`flex min-w-0 items-center gap-3 rounded-sm border px-2.5 py-2 transition-colors ${
+          state === "selected"
+            ? STATE_CLASS.selected
+            : "border-neutral-200 bg-white hover:border-neutral-400 hover:bg-neutral-50"
+        } ${state === "dragging" ? "opacity-0" : ""} ${handle ? "cursor-grab select-none" : ""}`}
+      >
+        {handle && <GripVertical className="h-4 w-4 shrink-0 text-neutral-400" aria-hidden />}
+        <div className="h-11 w-7 shrink-0 border border-neutral-300 bg-neutral-200" aria-hidden />
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate text-xs font-bold text-neutral-900">{book.title}</h3>
+          <p className="mt-0.5 truncate text-[11px] text-neutral-600">{book.author} ・ {book.category}</p>
+          <p className="mt-0.5 text-[10px] font-medium text-neutral-500">お宝度 {book.score}</p>
+        </div>
+        {badge && <div className="shrink-0">{badge}</div>}
       </article>
     );
   }
@@ -77,7 +108,8 @@ export function BookTile({
   return (
     <article
       {...dragProps}
-      className={`rounded-md p-2 transition-all hover:-translate-y-0.5 hover:border-neutral-500 hover:shadow-sm ${STATE_CLASS[state]} ${handle ? "cursor-grab select-none" : ""}`}
+      aria-grabbed={false}
+      className={`rounded-md p-2 transition-all duration-200 ${STATE_CLASS[state]} ${handle ? "cursor-grab select-none" : ""}`}
     >
       <div className={`relative flex items-center justify-center bg-neutral-200 ${COVER_CLASS[cover]}`}>
         {handle && (
