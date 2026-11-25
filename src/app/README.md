@@ -60,7 +60,7 @@ URL | ファイル | 端末 | ログイン | 担当
 ## page.tsx の書き方
 
 ```tsx
-// (dashboard)/collection/page.tsx（例。getMyCollection などはこれから作る）
+// (dashboard)/dashboard/collection/page.tsx（例。getMyCollection などはこれから作る）
 import { Suspense } from "react";
 
 import { CollectionList } from "@/components/desktop/CollectionList";
