@@ -28,7 +28,7 @@ export default function RegisterPage() {
         <RegisterForm />
 
         {/* ログイン案内 */}
-        <div className="mt-6 pt-5 border-t border-gray-150 text-center text-xs text-gray-500">
+        <div className="mt-6 pt-5 border-t border-gray-200 text-center text-xs text-gray-500">
           すでにアカウントをお持ちですか？{" "}
           <Link
             href="/login"

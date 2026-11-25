@@ -40,7 +40,7 @@ export default function LoginPage({
         </Suspense>
 
         {/* 新規登録案内 */}
-        <div className="mt-6 pt-5 border-t border-gray-150 text-center text-xs text-gray-500">
+        <div className="mt-6 pt-5 border-t border-gray-200 text-center text-xs text-gray-500">
           アカウントをお持ちでないですか？{" "}
           <Link
             href="/register"
