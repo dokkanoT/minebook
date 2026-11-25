@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { BookOpen, Sparkles, CheckCircle2, Bookmark, ShoppingCart, PenLine } from 'lucide-react';
-import { calcRank } from '../../_data/rank';
+import React, { useState, useRef } from 'react';
+import { Sparkles, CheckCircle2, Bookmark, ShoppingCart, PenLine } from 'lucide-react';
 import type { BookItem, FlagType } from '../../_data/types';
+import { evaluateBookPrice, RANK_BADGE_BG } from '../../_data/bookEvaluation';
+import { BookCover } from './BookCover';
 import { PriceInputSection } from './PriceInputSection';
 import { FlagDropdown } from './FlagDropdown';
 import { ReviewCard } from './ReviewCard';
@@ -18,6 +19,7 @@ interface BookDetailViewProps {
 const SAMPLE_BOOK_MAP: Record<string, BookItem> = {
   '9784560027783': {
     id: 'book-unrated-1',
+    isMock: true,
     title: '夜を読む ―失われた読書体験を求めて',
     author: 'アルベルト・マングェル',
     scanDate: 'たった今',
@@ -39,6 +41,7 @@ const SAMPLE_BOOK_MAP: Record<string, BookItem> = {
   },
   '9784873115658': {
     id: 'book-2',
+    isMock: true,
     title: 'リーダブルコード ―より良いコードを書くための実践テクニック',
     author: 'Dustin Boswell, Trevor Foucher',
     scanDate: '昨日 17:45',
@@ -73,14 +76,17 @@ export const BookDetailView = ({
   const [isInputtingPrice, setIsInputtingPrice] = useState(false);
   const [priceInputValue, setPriceInputValue] = useState('');
   const [justEvaluated, setJustEvaluated] = useState(false);
+  const evalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // お宝度判定の実行
   const handleExecuteEvaluation = (price: number) => {
+    const { rank } = evaluateBookPrice(currentBook.originalPrice, price);
+
     const updated: BookItem = {
       ...currentBook,
       isEvaluated: true,
       shopPrice: price,
-      rank: calcRank(currentBook.originalPrice, price),
+      rank,
     };
 
     setCurrentBook(updated);
@@ -89,8 +95,12 @@ export const BookDetailView = ({
     setJustEvaluated(true);
     if (onSave) onSave(updated);
 
-    setTimeout(() => {
+    if (evalTimerRef.current) {
+      clearTimeout(evalTimerRef.current);
+    }
+    evalTimerRef.current = setTimeout(() => {
       setJustEvaluated(false);
+      evalTimerRef.current = null;
     }, 3000);
   };
 
@@ -100,6 +110,9 @@ export const BookDetailView = ({
     if (onSave) onSave(updated);
   };
 
+  const evaluation = evaluateBookPrice(currentBook.originalPrice, currentBook.shopPrice);
+  const activeRank = currentBook.rank ?? evaluation.rank;
+
   return (
     <div className="w-full flex-1 flex flex-col justify-between bg-white text-gray-900 overflow-hidden">
       {/* スクロールコンテンツエリア */}
@@ -107,10 +120,11 @@ export const BookDetailView = ({
         {/* 書影 & タイトル & 著者 ＋ フラグメニュー */}
         <div className="flex gap-4 items-start justify-between">
           <div className="flex gap-4 items-start flex-1 min-w-0">
-            <div className="w-16 h-20 bg-[#F0F1F2] rounded-2xl flex flex-col items-center justify-center text-gray-400 shrink-0">
-              <BookOpen className="w-6 h-6 stroke-[1.5] mb-1 text-gray-400" />
-              <span className="text-[10px] text-gray-400 font-medium">書影</span>
-            </div>
+            <BookCover
+              coverUrl={currentBook.coverUrl}
+              title={currentBook.title}
+              size="lg"
+            />
 
             <div className="flex-1 min-w-0">
               <h2 className="text-base font-bold text-gray-900 leading-snug">
@@ -133,13 +147,13 @@ export const BookDetailView = ({
           <div className="flex items-center">
             <span className="w-16 text-gray-400 shrink-0 font-normal">発売日</span>
             <span className="text-gray-900 font-medium">
-              {currentBook.publishedDate || currentBook.publishedYear}
+              {currentBook.publishedDate || currentBook.publishedYear || '情報なし'}
             </span>
           </div>
           <div className="flex items-center">
             <span className="w-16 text-gray-400 shrink-0 font-normal">出版社</span>
             <span className="text-gray-900 font-medium">
-              {currentBook.publisher || '白水社'}
+              {currentBook.publisher || '情報なし'}
             </span>
           </div>
         </div>
@@ -149,11 +163,13 @@ export const BookDetailView = ({
           <div className="mt-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold py-2 px-3 rounded-xl flex items-center justify-between shadow-md animate-pulse">
             <div className="flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-yellow-200" />
-              <span>お宝判定完了！ RANK {currentBook.rank} 獲得 🎉</span>
+              <span>お宝判定完了！ RANK {activeRank} 獲得 🎉</span>
             </div>
-            <span className="bg-white/20 px-2 py-0.5 rounded text-[11px] font-black">
-              {Math.round((1 - currentBook.shopPrice / currentBook.originalPrice) * 100)}% OFF
-            </span>
+            {evaluation.discountPercent !== null && (
+              <span className="bg-white/20 px-2 py-0.5 rounded text-[11px] font-black">
+                {evaluation.discountPercent}% OFF
+              </span>
+            )}
           </div>
         )}
 
@@ -161,25 +177,29 @@ export const BookDetailView = ({
         <div className="mt-3.5 flex items-center justify-between">
           {currentBook.isEvaluated ? (
             <>
-              <div className="flex items-baseline gap-2">
+              <div className="flex items-baseline gap-2 flex-wrap">
                 <span className="text-xl font-black text-rose-600">
                   ¥{currentBook.shopPrice.toLocaleString()}
                 </span>
-                <span className="text-xs text-gray-400 line-through">
-                  定価 ¥{currentBook.originalPrice.toLocaleString()}
-                </span>
-                <span className="text-[10px] font-bold text-amber-800 bg-amber-100/80 px-1.5 py-0.5 rounded">
-                  {Math.round((1 - currentBook.shopPrice / currentBook.originalPrice) * 100)}% OFF
-                </span>
+                {currentBook.originalPrice > 0 ? (
+                  <>
+                    <span className="text-xs text-gray-400 line-through">
+                      定価 ¥{currentBook.originalPrice.toLocaleString()}
+                    </span>
+                    {evaluation.discountPercent !== null && (
+                      <span className="text-[10px] font-bold text-amber-800 bg-amber-100/80 px-1.5 py-0.5 rounded">
+                        {evaluation.discountPercent}% OFF
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-xs text-gray-400">定価情報なし</span>
+                )}
               </div>
-              <span className={`text-white text-[11px] font-black px-2.5 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs ${
-                currentBook.rank === 'S'
-                  ? 'bg-amber-500'
-                  : currentBook.rank === 'A'
-                  ? 'bg-indigo-500'
-                  : 'bg-gray-600'
-              }`}>
-                <Sparkles className="w-3 h-3" /> RANK {currentBook.rank}
+              <span
+                className={`text-white text-[11px] font-black px-2.5 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs shrink-0 ${RANK_BADGE_BG[activeRank]}`}
+              >
+                <Sparkles className="w-3 h-3" /> RANK {activeRank}
               </span>
             </>
           ) : (
@@ -195,12 +215,14 @@ export const BookDetailView = ({
               >
                 <PenLine className="w-3.5 h-3.5 text-[#9A6218]" />
                 <span>店頭価格 未入力</span>
-                <span className="text-[10px] bg-[#9A6218] text-white px-1.5 py-px rounded font-normal">
+                <span className="text-[10px] bg-[#9A6218] text-white px-1.5 py-0.5 rounded font-normal">
                   入力する
                 </span>
               </button>
               <span className="text-xs text-gray-400">
-                定価 ¥{currentBook.originalPrice.toLocaleString()}
+                {currentBook.originalPrice > 0
+                  ? `定価 ¥${currentBook.originalPrice.toLocaleString()}`
+                  : '定価情報なし'}
               </span>
             </>
           )}
@@ -229,21 +251,21 @@ export const BookDetailView = ({
               発掘データ詳細
             </h3>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="bg-white p-2 rounded-lg border border-gray-150">
+              <div className="bg-white p-2 rounded-lg border border-gray-200">
                 <span className="text-gray-400 block text-[10px]">発見店舗</span>
                 <span className="font-bold text-gray-800">{currentBook.storeName}</span>
               </div>
-              <div className="bg-white p-2 rounded-lg border border-gray-150">
+              <div className="bg-white p-2 rounded-lg border border-gray-200">
                 <span className="text-gray-400 block text-[10px]">ISBNコード</span>
                 <span className="font-bold text-gray-800">{currentBook.isbn}</span>
               </div>
-              <div className="bg-white p-2 rounded-lg border border-gray-150">
+              <div className="bg-white p-2 rounded-lg border border-gray-200">
                 <span className="text-gray-400 block text-[10px]">状態</span>
                 <span className="font-bold text-emerald-600 flex items-center gap-1">
                   <CheckCircle2 className="w-3.5 h-3.5" /> 帯付き・美品
                 </span>
               </div>
-              <div className="bg-white p-2 rounded-lg border border-gray-150">
+              <div className="bg-white p-2 rounded-lg border border-gray-200">
                 <span className="text-gray-400 block text-[10px]">スキャン日時</span>
                 <span className="font-bold text-gray-800">{currentBook.scanDate}</span>
               </div>
@@ -292,19 +314,17 @@ export const BookDetailView = ({
                 </div>
               </div>
             ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsInputtingPrice(true);
-                    setPriceInputValue('');
-                  }}
-                  className="w-full py-3.5 bg-[#9E6219] hover:bg-[#8A5414] active:scale-[0.99] text-white font-bold text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <PenLine className="w-4 h-4 stroke-[2.2]" />
-                  店頭価格を入力
-                </button>
-              </>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsInputtingPrice(true);
+                  setPriceInputValue('');
+                }}
+                className="w-full py-3.5 bg-[#9E6219] hover:bg-[#8A5414] active:scale-[0.99] text-white font-bold text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <PenLine className="w-4 h-4 stroke-[2.2]" />
+                店頭価格を入力
+              </button>
             )}
           </div>
         )}

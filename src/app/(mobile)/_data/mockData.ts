@@ -1,9 +1,35 @@
-import type { BookItem } from './types';
+import type { BookItem, ScannedItem } from './types';
+
+export const DEFAULT_SCANNED_LIST: ScannedItem[] = [
+  {
+    id: 'scanned-1',
+    title: '古書のある風景',
+    statusText: '未評価・店頭価格未入力',
+    isEvaluated: false,
+    isMock: true,
+  },
+  {
+    id: 'scanned-2',
+    title: '夜を読む',
+    statusText: '未評価・店頭価格未入力',
+    isEvaluated: false,
+    isMock: true,
+  },
+  {
+    id: 'scanned-3',
+    title: '小さな物語',
+    statusText: '評価済・未保存・A（表示例）',
+    isEvaluated: true,
+    isMock: true,
+    rank: 'A',
+  },
+];
 
 export const INITIAL_BOOKS: BookItem[] = [
   // 1. スキャンしただけで、まだ店頭価格とお宝度判定をしていない本（未評価）
   {
     id: 'book-unrated-1',
+    isMock: true,
     title: '夜を読む ―失われた読書体験を求めて',
     author: 'アルベルト・マングェル',
     scanDate: 'たった今',
@@ -26,6 +52,7 @@ export const INITIAL_BOOKS: BookItem[] = [
   // 2. お宝判定済みの本（評価済み・保留中）
   {
     id: 'book-1',
+    isMock: true,
     title: '古書のある風景',
     author: '山田 文子',
     scanDate: '今日 10:24',
@@ -49,6 +76,7 @@ export const INITIAL_BOOKS: BookItem[] = [
   // 3. お宝判定済みの本（Sランク・購入済）
   {
     id: 'book-2',
+    isMock: true,
     title: 'リーダブルコード ―より良いコードを書くための実践テクニック',
     author: 'Dustin Boswell, Trevor Foucher',
     scanDate: '昨日 17:45',
@@ -72,6 +100,7 @@ export const INITIAL_BOOKS: BookItem[] = [
   // 4. お宝判定済みの本
   {
     id: 'book-3',
+    isMock: true,
     title: '達人プログラマー ―熟達に向けたあなたの旅',
     author: 'David Thomas, Andrew Hunt',
     scanDate: '10/12 14:10',
@@ -95,6 +124,7 @@ export const INITIAL_BOOKS: BookItem[] = [
   // 5. お宝判定済みの本
   {
     id: 'book-4',
+    isMock: true,
     title: '人月の神話 ―狼人間を撃つ銀の弾はない',
     author: 'Frederick P. Brooks Jr.',
     scanDate: '10/08 11:30',

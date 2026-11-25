@@ -61,7 +61,7 @@ export function FlagDropdown({ currentFlag, onSelectFlag }: FlagDropdownProps) {
         <button
           type="button"
           onClick={() => handleSelect('purchased')}
-          className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2.5 transition-colors active:bg-gray-150 ${
+          className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2.5 transition-colors active:bg-gray-100 ${
             currentFlag === 'purchased'
               ? 'bg-emerald-50 text-emerald-800 font-bold'
               : 'text-gray-800 hover:bg-gray-100/70'
@@ -73,7 +73,7 @@ export function FlagDropdown({ currentFlag, onSelectFlag }: FlagDropdownProps) {
         <button
           type="button"
           onClick={() => handleSelect('pending')}
-          className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2.5 transition-colors active:bg-gray-150 ${
+          className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2.5 transition-colors active:bg-gray-100 ${
             currentFlag === 'pending'
               ? 'bg-amber-50 text-amber-800 font-bold'
               : 'text-gray-800 hover:bg-gray-100/70'
@@ -85,7 +85,7 @@ export function FlagDropdown({ currentFlag, onSelectFlag }: FlagDropdownProps) {
         <button
           type="button"
           onClick={() => handleSelect('skip')}
-          className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2.5 transition-colors active:bg-gray-150 ${
+          className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2.5 transition-colors active:bg-gray-100 ${
             currentFlag === 'skip'
               ? 'bg-gray-100 text-gray-900 font-bold'
               : 'text-gray-800 hover:bg-gray-100/70'
