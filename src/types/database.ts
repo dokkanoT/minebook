@@ -25,6 +25,8 @@ export type Database = {
           list_price: number | null
           publisher: string | null
           rakuten_genre_id: string | null
+          review_average: number | null
+          review_count: number | null
           title: string
           updated_at: string
         }
@@ -38,6 +40,8 @@ export type Database = {
           list_price?: number | null
           publisher?: string | null
           rakuten_genre_id?: string | null
+          review_average?: number | null
+          review_count?: number | null
           title: string
           updated_at?: string
         }
@@ -51,6 +55,8 @@ export type Database = {
           list_price?: number | null
           publisher?: string | null
           rakuten_genre_id?: string | null
+          review_average?: number | null
+          review_count?: number | null
           title?: string
           updated_at?: string
         }

@@ -14,6 +14,9 @@ export type RakutenBook = {
   coverUrl: string | null;
   // "001004008/001019001" のようなスラッシュ区切り
   genreId: string | null;
+  // レビューの平均（0〜5）と件数。レビューがない本は平均が null、件数が 0
+  reviewAverage: number | null;
+  reviewCount: number;
 };
 
 type RakutenResponse = {
@@ -25,6 +28,9 @@ type RakutenResponse = {
     itemCaption: string;
     largeImageUrl: string;
     booksGenreId: string;
+    // "3.96" のような文字列で返る。レビューがない本は "0.00"
+    reviewAverage: string;
+    reviewCount: number;
   }>;
 };
 
@@ -75,5 +81,19 @@ export async function fetchBookFromRakuten(
     description: item.itemCaption || null,
     coverUrl: item.largeImageUrl || null,
     genreId: item.booksGenreId || null,
+    ...toReview(item.reviewAverage, item.reviewCount),
+  };
+}
+
+// レビューが 0 件の本は平均も "0.00" で返るので、星 0 と区別するために null にする
+function toReview(average: string, count: number) {
+  const reviewCount = Number.isInteger(count) && count > 0 ? count : 0;
+  const reviewAverage = Number.parseFloat(average);
+  return {
+    reviewCount,
+    reviewAverage:
+      reviewCount > 0 && reviewAverage >= 0 && reviewAverage <= 5
+        ? reviewAverage
+        : null,
   };
 }
