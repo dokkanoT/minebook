@@ -80,6 +80,10 @@ export function ScanWorkspace({ initialScannedList }: ScanWorkspaceProps) {
         publishedYear: '',
         publisher: dbBook.publisher ?? '情報なし',
         description: dbBook.description ?? 'あらすじ情報はありません。',
+        // レビューがない本は ReviewCard が表示されない
+        reviewRating: dbBook.review_average ?? undefined,
+        reviewCount: dbBook.review_count ?? undefined,
+        reviewSource: '楽天ブックス',
         flag: 'none',
       };
 
