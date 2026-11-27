@@ -55,7 +55,7 @@ URL | ファイル | 端末 | ログイン | 担当
 `not-found.tsx` | 404 表示 | `notFound()` を呼ぶと表示される
 `route.ts` | API エンドポイント | **バックエンドのみ**。画面からの更新は Server Action を使う
 `_components/` | その画面でしか使わない部品 | `_` で始まるフォルダは URL にならない。`(mobile)/_components/`・`(dashboard)/dashboard/_components/`
-`_data/` | その画面でしか使わない型・変換・計算・仮データ | 例：`(mobile)/_data/rank.ts`（お宝度の判定）。仮データ（`mockData.ts` など）は DB につないだら消す
+`_data/` | その画面でしか使わない型・変換・計算・仮データ | 例：`(mobile)/_data/fromCollection.ts`（DB のデータを画面の形に変える）。仮データ（`mockData.ts` など）は DB につないだら消す
 
 - 画面をまたいで使う部品は `components/` に置く（下記）
 - データの取得・更新（Supabase を呼ぶ処理）は `features/` に置き、`_data/` には置かない
