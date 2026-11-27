@@ -38,6 +38,8 @@ category | text | カテゴリー（FK → categories.slug）。決められな�
 rakuten_genre_id | text | 楽天ブックスのジャンル ID（カテゴリーを決めるのに使う）
 review_average | numeric(3,2) | 楽天ブックスのレビュー平均（0〜5）。レビューが 0 件なら null
 review_count | integer | 楽天ブックスのレビュー件数（0 以上）
+published_date | date | 発売日（年月まで。日はいつも 1 日。年しか分からなければ 1 月 1 日）。openBD を優先し、なければ楽天ブックス。分からなければ null
+published_date_precision | text | 発売日がどこまで分かっているか。`year`（年まで）か `month`（年月まで）。発売日が null なら null
 created_at | timestamptz | 作成日時
 updated_at | timestamptz | 更新日時（更新時にトリガーで自動更新）
 
