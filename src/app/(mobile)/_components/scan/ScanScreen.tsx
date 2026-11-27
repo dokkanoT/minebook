@@ -7,6 +7,7 @@ import { DEFAULT_SCANNED_LIST } from '../../_data/mockData';
 import type { ScannedItem } from '../../_data/types';
 import { CameraPreview } from './CameraPreview';
 import { ScanDeleteDialog } from './ScanDeleteDialog';
+import { isNextRedirectError } from '@/lib/utils/next-errors';
 
 export type { ScannedItem };
 export { DEFAULT_SCANNED_LIST };
@@ -105,6 +106,8 @@ export const ScanScreen = ({
 
       setPendingDeleteItem(null);
     } catch (err) {
+      // ログイン切れなどの転送はエラー表示にせず、そのまま Next.js に任せる
+      if (isNextRedirectError(err)) throw err;
       setDeleteError(
         err instanceof Error ? err.message : '削除中にエラーが発生しました。',
       );

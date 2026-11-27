@@ -8,6 +8,8 @@ import {
   removeFromCollection,
   updateCollectionItem,
 } from '@/features/collection/actions';
+import { COLLECTION_ITEM_NOT_FOUND } from '@/features/collection/messages';
+import { isNextRedirectError } from '@/lib/utils/next-errors';
 import { BookBottomSheet } from '../book/BookBottomSheet';
 import { INITIAL_BOOKS } from '../../_data/mockData';
 import { evaluateBookPrice } from '../../_data/bookEvaluation';
@@ -15,16 +17,6 @@ import type { BookItem, FlagType, ScannedItem, SheetState } from '../../_data/ty
 
 interface ScanWorkspaceProps {
   initialScannedList: ScannedItem[];
-}
-
-function isNextRedirectError(err: unknown): boolean {
-  return (
-    typeof err === 'object' &&
-    err !== null &&
-    'digest' in err &&
-    typeof err.digest === 'string' &&
-    err.digest.startsWith('NEXT_REDIRECT')
-  );
 }
 
 /**
@@ -282,7 +274,8 @@ export function ScanWorkspace({ initialScannedList }: ScanWorkspaceProps) {
     if (!item.isMock && collectionItemId) {
       try {
         const res = await removeFromCollection({ id: collectionItemId });
-        if (!res.ok) {
+        // 別の画面・端末ですでに削除済みなら、目的は達成済みとしてリストからも消す
+        if (!res.ok && res.error !== COLLECTION_ITEM_NOT_FOUND) {
           return { ok: false, error: res.error };
         }
         delete collectionIdRef.current[item.id];
