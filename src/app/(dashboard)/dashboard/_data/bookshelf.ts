@@ -20,12 +20,13 @@ export const SHELVES: ShelfView[] = [SHELF_HUMANITIES, SHELF_ART, SHELF_NATURE, 
 /** 棚に置かれている本のID */
 const PLACED_IDS = new Set(SHELVES.flatMap((shelf) => shelf.books.map((b) => b.id)));
 
-/** 収集プール（全12冊。棚に置かれていれば placed = true） */
+/** 収集プール（棚に置かれていれば placed = true） */
 export const POOL_BOOKS: PoolBook[] = MOCK_BOOKS.map((book) => ({
   id: book.id,
   title: book.title,
   author: book.author,
   category: book.category,
+  pageCount: book.pageCount,
   score: book.score,
   placed: PLACED_IDS.has(book.id),
 }));

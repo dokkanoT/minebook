@@ -69,7 +69,7 @@ export function BookPool({
     <Panel
       title="収集プール"
       action={<span className="text-[11px] text-neutral-500">スキャンで集めた本</span>}
-      className="shadow-sm"
+      className="shadow-sm lg:sticky lg:top-[4.5rem] lg:flex lg:max-h-[calc(100vh-5.5rem)] lg:min-h-0 lg:flex-col"
     >
       <div
         onDragOver={(event) => {
@@ -80,7 +80,7 @@ export function BookPool({
           const bookId = event.dataTransfer.getData("text/plain");
           if (bookId) onDropBook?.(bookId);
         }}
-        className={`rounded-sm transition-colors ${dropActive ? "ring-2 ring-neutral-900 ring-offset-2" : ""}`}
+        className={`rounded-sm transition-colors lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden ${dropActive ? "ring-2 ring-neutral-900 ring-offset-2" : ""}`}
       >
         <div className="grid grid-cols-2 gap-1 rounded-sm bg-neutral-100 p-1">
           {tabs.map((tab) => {
@@ -119,7 +119,7 @@ export function BookPool({
         {filtered.length === 0 ? (
           <p className="py-10 text-center text-xs text-neutral-500">条件に一致する本はありません。</p>
         ) : (
-          <div className="mt-2 max-h-[34rem] space-y-1.5 overflow-y-auto pr-1">
+          <div className="mt-2 h-[30rem] shrink-0 space-y-1.5 overflow-y-auto pr-1">
             {filtered.map((book) => (
               <div key={book.id} className="relative">
                 <BookTile

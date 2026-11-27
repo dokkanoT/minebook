@@ -7,8 +7,34 @@ export type TileBook = {
   title: string;
   author: string;
   category: string;
+  pageCount: number;
   score: number;
 };
+
+export const CATEGORY_SPINE_CLASS: Record<string, string> = {
+  文学: "bg-sky-800",
+  芸術: "bg-violet-800",
+  人文: "bg-amber-800",
+  自然科学: "bg-emerald-800",
+};
+
+const CATEGORY_SPINE_COLOR: Record<string, string> = {
+  文学: "#075985",
+  芸術: "#5b21b6",
+  人文: "#78350f",
+  自然科学: "#065f46",
+};
+
+export const MIN_SPINE_WIDTH = 52;
+const MAX_SPINE_WIDTH = 92;
+
+export function getSpineWidth(pageCount: number) {
+  return Math.max(MIN_SPINE_WIDTH, Math.min(MAX_SPINE_WIDTH, Math.round(44 + pageCount / 18)));
+}
+
+export function getSpineColor(category: string) {
+  return CATEGORY_SPINE_COLOR[category] ?? "#404040";
+}
 
 /** default: 通常 / dragging: ドラッグ中 / selected: 選択中 */
 export type TileState = "default" | "dragging" | "selected";
@@ -63,10 +89,11 @@ export function BookTile({
       <button
         {...dragProps}
         type="button"
-        aria-label={`${book.title}、${book.author}、${book.category}、お宝度${book.score}`}
+        aria-label={`${book.title}、${book.author}、${book.category}、${book.pageCount}ページ、お宝度${book.score}`}
         aria-grabbed={state === "dragging"}
         onClick={() => onSelect?.(book)}
-        className={`relative flex h-36 w-12 shrink-0 flex-col items-center justify-between rounded-t-sm border bg-neutral-700 px-1.5 py-2 text-white transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2 ${
+        style={{ width: getSpineWidth(book.pageCount), backgroundColor: getSpineColor(book.category) }}
+        className={`relative flex h-36 shrink-0 flex-col items-center justify-between rounded-t-sm border border-white/20 px-1.5 py-2 text-white transition-[transform,box-shadow] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2 ${
           state === "dragging"
             ? "pointer-events-none opacity-0"
             : "border-neutral-400 shadow-sm hover:-translate-y-1 hover:shadow-md"
@@ -85,7 +112,7 @@ export function BookTile({
     return (
       <article
         {...dragProps}
-        aria-label={`${book.title}、${book.author}、${book.category}、お宝度${book.score}`}
+        aria-label={`${book.title}、${book.author}、${book.category}、${book.pageCount}ページ、お宝度${book.score}`}
         aria-grabbed={false}
         className={`flex min-w-0 items-center gap-3 rounded-sm border px-2.5 py-2 transition-colors ${
           state === "selected"
@@ -94,7 +121,7 @@ export function BookTile({
         } ${state === "dragging" ? "opacity-0" : ""} ${handle ? "cursor-grab select-none" : ""}`}
       >
         {handle && <GripVertical className="h-4 w-4 shrink-0 text-neutral-400" aria-hidden />}
-        <div className="h-11 w-7 shrink-0 border border-neutral-300 bg-neutral-200" aria-hidden />
+        <div className={`h-11 w-7 shrink-0 border border-neutral-300 ${CATEGORY_SPINE_CLASS[book.category] ?? "bg-neutral-300"}`} aria-hidden />
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-xs font-bold text-neutral-900">{book.title}</h3>
           <p className="mt-0.5 truncate text-[11px] text-neutral-600">{book.author} ・ {book.category}</p>
@@ -112,6 +139,7 @@ export function BookTile({
       className={`rounded-md p-2 transition-all duration-200 ${STATE_CLASS[state]} ${handle ? "cursor-grab select-none" : ""}`}
     >
       <div className={`relative flex items-center justify-center bg-neutral-200 ${COVER_CLASS[cover]}`}>
+        <span className={`absolute inset-x-0 top-0 h-1 ${CATEGORY_SPINE_CLASS[book.category] ?? "bg-neutral-500"}`} aria-hidden />
         {handle && (
           <GripVertical
             className="absolute right-0.5 top-0.5 h-3.5 w-3.5 text-neutral-500"
