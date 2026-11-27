@@ -70,7 +70,7 @@ export function ScanWorkspace({ initialScannedList }: ScanWorkspaceProps) {
         shopPrice: 0,
         storeName: '古本屋',
         isbn: dbBook.isbn,
-        ...toPublishedFields(dbBook.published_date),
+        ...toPublishedFields(dbBook),
         publisher: dbBook.publisher ?? '情報なし',
         description: dbBook.description ?? 'あらすじ情報はありません。',
         // レビューがない本は ReviewCard が表示されない

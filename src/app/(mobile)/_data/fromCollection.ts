@@ -19,7 +19,7 @@ export function toBookItem(item: CollectionItem): BookItem {
   const originalPrice = book.list_price ?? 0;
   // 店頭価格が入っていれば判定済み。お宝度は保存せず、毎回計算する
   const isEvaluated = item.store_price !== null;
-  const published = toPublishedFields(book.published_date);
+  const published = toPublishedFields(book);
   const reviewRating = book.review_average ?? undefined;
   const reviewCount = book.review_count ?? undefined;
 
