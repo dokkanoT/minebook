@@ -1,6 +1,7 @@
 import "server-only";
 
 import { requireUser } from "@/features/auth/dal";
+import { calcTreasure, type Rank } from "@/features/treasure/score";
 import { createClient } from "@/lib/supabase/server";
 
 export type ShelfWithCount = {
@@ -37,7 +38,9 @@ export type BookshelfItem = {
   author: string | null;
   // categories.slug（未分類は null）
   category: string | null;
+  // お宝度（0〜100）とランク。店頭価格が入っていない本（未評価）は null
   treasureScore: number | null;
+  treasureRank: Rank | null;
   shelfId: string | null;
   // 配置済みの棚の名前（未配置は null）
   shelfName: string | null;
@@ -75,7 +78,7 @@ export async function getMyBookshelf(): Promise<Bookshelf> {
     supabase
       .from("collection_items")
       .select(
-        "id, isbn, shelf_id, shelf_position, treasure_score, status, scanned_at, book:books!inner(title, author, category)",
+        "id, isbn, shelf_id, shelf_position, store_price, status, scanned_at, book:books!inner(title, author, category, list_price, review_average, review_count, published_date)",
       )
       .eq("user_id", user.id)
       .order("scanned_at", { ascending: false }),
@@ -84,21 +87,38 @@ export async function getMyBookshelf(): Promise<Bookshelf> {
   if (itemsResult.error) throw itemsResult.error;
 
   const shelfNames = new Map(shelvesResult.data.map((s) => [s.id, s.name]));
-  const pool = itemsResult.data.map((row) => ({
-    position: row.shelf_position,
-    item: {
-      itemId: row.id,
-      isbn: row.isbn,
-      title: row.book.title,
-      author: row.book.author,
-      category: row.book.category,
-      treasureScore: row.treasure_score,
-      shelfId: row.shelf_id,
-      shelfName: row.shelf_id ? (shelfNames.get(row.shelf_id) ?? null) : null,
-      status: row.status,
-      scannedAt: row.scanned_at,
-    } satisfies BookshelfItem,
-  }));
+  const now = new Date();
+  const pool = itemsResult.data.map((row) => {
+    const treasure =
+      row.store_price !== null
+        ? calcTreasure(
+            {
+              listPrice: row.book.list_price,
+              storePrice: row.store_price,
+              reviewAverage: row.book.review_average,
+              reviewCount: row.book.review_count,
+              publishedDate: row.book.published_date,
+            },
+            now,
+          )
+        : null;
+    return {
+      position: row.shelf_position,
+      item: {
+        itemId: row.id,
+        isbn: row.isbn,
+        title: row.book.title,
+        author: row.book.author,
+        category: row.book.category,
+        treasureScore: treasure?.score ?? null,
+        treasureRank: treasure?.rank ?? null,
+        shelfId: row.shelf_id,
+        shelfName: row.shelf_id ? (shelfNames.get(row.shelf_id) ?? null) : null,
+        status: row.status,
+        scannedAt: row.scanned_at,
+      } satisfies BookshelfItem,
+    };
+  });
 
   const shelves = shelvesResult.data.map((shelf) => {
     const items = pool

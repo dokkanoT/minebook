@@ -27,7 +27,7 @@ export function toBookshelfView(
     title: item.title,
     author: item.author ?? "著者不明",
     category: (item.category && categoryNames.get(item.category)) ?? UNCATEGORIZED,
-    // お宝度の計算は別ブランチで作るので、今は null（画面では「—」）
+    // 店頭価格を入れていない本は null（画面では「—」）
     score: item.treasureScore,
     status: isBookStatus(item.status) ? item.status : null,
   });
