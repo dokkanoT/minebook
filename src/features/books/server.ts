@@ -42,6 +42,7 @@ export async function getOrCreateBook(isbn13: string): Promise<Book | null> {
         category: categoryFromRakutenGenre(fetched.rakutenGenreId),
         review_average: fetched.reviewAverage,
         review_count: fetched.reviewCount,
+        published_date: fetched.publishedDate,
       },
       // 同時スキャンで競合しても既存行を優先
       { onConflict: "isbn", ignoreDuplicates: true },
@@ -84,6 +85,7 @@ async function fetchBookData(isbn13: string) {
     description: o?.description ?? r?.description ?? null,
     coverUrl: o?.coverUrl ?? r?.coverUrl ?? null,
     listPrice: o?.listPrice ?? null,
+    publishedDate: o?.publishedDate ?? r?.publishedDate ?? null,
     rakutenGenreId: r?.genreId ?? null,
     // レビューは楽天にしかない。楽天で見つからない本は null（0 件とは区別する）
     reviewAverage: r?.reviewAverage ?? null,

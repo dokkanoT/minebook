@@ -1,5 +1,7 @@
 import "server-only";
 
+import { parsePublishedDate } from "@/lib/utils/published-date";
+
 // 2026 年の仕様変更後のエンドポイント（applicationId に加えて accessKey と Referer が必須）
 const BOOKS_SEARCH_ENDPOINT =
   "https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404";
@@ -14,6 +16,8 @@ export type RakutenBook = {
   coverUrl: string | null;
   // "001004008/001019001" のようなスラッシュ区切り
   genreId: string | null;
+  // "YYYY-MM-DD"。分からなければ null
+  publishedDate: string | null;
   // レビューの平均（0〜5）と件数。レビューがない本は平均が null、件数が 0
   reviewAverage: number | null;
   reviewCount: number;
@@ -28,6 +32,8 @@ type RakutenResponse = {
     itemCaption: string;
     largeImageUrl: string;
     booksGenreId: string;
+    // "2012年06月15日頃" / "2012年06月" など
+    salesDate: string;
     // "3.96" のような文字列で返る。レビューがない本は "0.00"
     reviewAverage: string;
     reviewCount: number;
@@ -81,6 +87,7 @@ export async function fetchBookFromRakuten(
     description: item.itemCaption || null,
     coverUrl: item.largeImageUrl || null,
     genreId: item.booksGenreId || null,
+    publishedDate: parsePublishedDate(item.salesDate),
     ...toReview(item.reviewAverage, item.reviewCount),
   };
 }

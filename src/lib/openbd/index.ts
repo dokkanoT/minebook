@@ -1,5 +1,7 @@
 import "server-only";
 
+import { parsePublishedDate } from "@/lib/utils/published-date";
+
 const OPENBD_ENDPOINT = "https://api.openbd.jp/v1/get";
 
 export type OpenBDBook = {
@@ -10,6 +12,8 @@ export type OpenBDBook = {
   description: string | null;
   coverUrl: string | null;
   listPrice: number | null;
+  // "YYYY-MM-DD"。分からなければ null
+  publishedDate: string | null;
 };
 
 // openBD のレスポンスのうち使う部分だけ
@@ -20,6 +24,8 @@ type OpenBDResponse = Array<{
     author: string;
     publisher: string;
     cover: string;
+    // "20120615" / "201206" など
+    pubdate: string;
   };
   onix?: {
     CollateralDetail?: {
@@ -62,6 +68,7 @@ export async function fetchBookFromOpenBD(
     description,
     coverUrl: summary.cover || null,
     listPrice: Number.isFinite(price) && price > 0 ? price : null,
+    publishedDate: parsePublishedDate(summary.pubdate),
   };
 }
 
