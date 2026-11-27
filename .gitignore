@@ -56,6 +56,6 @@ next-env.d.ts
 supabase/.temp/
 supabase/.branches/
 
-# documentation / internal notes
-docs/
+# documentation / internal notes（メンバーへの依頼メモは個人の環境の情報を含むので共有しない）
+docs/requests/
 
