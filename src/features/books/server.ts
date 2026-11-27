@@ -2,6 +2,7 @@ import "server-only";
 
 import { fetchBookFromOpenBD } from "@/lib/openbd";
 import { fetchBookFromRakuten } from "@/lib/rakuten";
+import { pickPublishedDate } from "@/lib/utils/published-date";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/types/database";
@@ -42,7 +43,8 @@ export async function getOrCreateBook(isbn13: string): Promise<Book | null> {
         category: categoryFromRakutenGenre(fetched.rakutenGenreId),
         review_average: fetched.reviewAverage,
         review_count: fetched.reviewCount,
-        published_date: fetched.publishedDate,
+        published_date: fetched.publishedDate?.date ?? null,
+        published_date_precision: fetched.publishedDate?.precision ?? null,
       },
       // 同時スキャンで競合しても既存行を優先
       { onConflict: "isbn", ignoreDuplicates: true },
@@ -85,7 +87,7 @@ async function fetchBookData(isbn13: string) {
     description: o?.description ?? r?.description ?? null,
     coverUrl: o?.coverUrl ?? r?.coverUrl ?? null,
     listPrice: o?.listPrice ?? null,
-    publishedDate: o?.publishedDate ?? r?.publishedDate ?? null,
+    publishedDate: pickPublishedDate(o?.publishedDate, r?.publishedDate),
     rakutenGenreId: r?.genreId ?? null,
     // レビューは楽天にしかない。楽天で見つからない本は null（0 件とは区別する）
     reviewAverage: r?.reviewAverage ?? null,

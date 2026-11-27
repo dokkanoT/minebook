@@ -1,6 +1,6 @@
 import "server-only";
 
-import { parsePublishedDate } from "@/lib/utils/published-date";
+import { type PublishedDate, parsePublishedDate } from "@/lib/utils/published-date";
 
 const OPENBD_ENDPOINT = "https://api.openbd.jp/v1/get";
 
@@ -12,8 +12,8 @@ export type OpenBDBook = {
   description: string | null;
   coverUrl: string | null;
   listPrice: number | null;
-  // "YYYY-MM-DD"。分からなければ null
-  publishedDate: string | null;
+  // 年月まで。分からなければ null
+  publishedDate: PublishedDate | null;
 };
 
 // openBD のレスポンスのうち使う部分だけ

@@ -1,16 +1,16 @@
 // 登録済みの本（books）に、あとから追加した列の値を入れ直すスクリプト
-// - published_date（発売日）：openBD の pubdate、なければ楽天ブックスの salesDate
+// - published_date / published_date_precision（発売日）：openBD の pubdate、なければ楽天ブックスの salesDate
 // - review_average / review_count（楽天ブックスのレビュー）：楽天で見つかった本だけ最新の値に更新
 //
 // 使い方（.env.local の SUPABASE_SECRET_KEY と RAKUTEN_* を使う）
 //   node --env-file=.env.local scripts/backfill-books.mjs          # 確認だけ（DB は変えない）
 //   node --env-file=.env.local scripts/backfill-books.mjs --apply  # DB を更新する
 //
-// 先に `pnpm db:push` で published_date 列を追加しておくこと
+// 先に `pnpm db:push` で published_date・published_date_precision 列を追加しておくこと
 
 import { createClient } from "@supabase/supabase-js";
 
-import { parsePublishedDate } from "../src/lib/utils/published-date.ts";
+import { parsePublishedDate, pickPublishedDate } from "../src/lib/utils/published-date.ts";
 
 const apply = process.argv.includes("--apply");
 
@@ -77,7 +77,7 @@ async function fetchRakuten(isbn) {
 
 const { data: books, error } = await supabase
   .from("books")
-  .select("isbn, title, published_date, review_average, review_count")
+  .select("isbn, title, published_date, published_date_precision, review_average, review_count")
   .order("created_at");
 if (error) {
   console.error("books を読めませんでした:", error.message);
@@ -96,8 +96,15 @@ for (const book of books) {
   }
 
   const update = {};
-  const publishedDate = o?.publishedDate ?? r?.publishedDate ?? null;
-  if (!book.published_date && publishedDate) update.published_date = publishedDate;
+  // 発売日が空の本か、年までしか分かっていなかった本で月まで分かったときだけ入れる
+  const published = pickPublishedDate(o?.publishedDate, r?.publishedDate);
+  const isBetter =
+    published &&
+    (!book.published_date || (book.published_date_precision === "year" && published.precision === "month"));
+  if (isBetter) {
+    update.published_date = published.date;
+    update.published_date_precision = published.precision;
+  }
   // 楽天で見つかった本だけレビューを更新する（見つからない・失敗した本は今の値のまま）
   if (r) {
     if (book.review_count !== r.reviewCount) update.review_count = r.reviewCount;

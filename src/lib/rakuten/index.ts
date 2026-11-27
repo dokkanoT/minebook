@@ -1,6 +1,6 @@
 import "server-only";
 
-import { parsePublishedDate } from "@/lib/utils/published-date";
+import { type PublishedDate, parsePublishedDate } from "@/lib/utils/published-date";
 
 // 2026 年の仕様変更後のエンドポイント（applicationId に加えて accessKey と Referer が必須）
 const BOOKS_SEARCH_ENDPOINT =
@@ -16,8 +16,8 @@ export type RakutenBook = {
   coverUrl: string | null;
   // "001004008/001019001" のようなスラッシュ区切り
   genreId: string | null;
-  // "YYYY-MM-DD"。分からなければ null
-  publishedDate: string | null;
+  // 年月まで。分からなければ null
+  publishedDate: PublishedDate | null;
   // レビューの平均（0〜5）と件数。レビューがない本は平均が null、件数が 0
   reviewAverage: number | null;
   reviewCount: number;

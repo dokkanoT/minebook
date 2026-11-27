@@ -224,7 +224,7 @@ ISBN がない古い本 | バーコードがないのでスキャンできない
 
 担当 | やること
 ---|---
-バックエンド | `books` に発売日の列を追加する（openBD の `pubdate`・楽天の `salesDate` から取る）
+バックエンド | `books` に発売日の列を追加する（openBD の `pubdate`・楽天の `salesDate` から取る。年月までにそろえる）
 バックエンド | 登録済みの本の発売日とレビューを取り直す（`scripts/backfill-books.mjs`）
 バックエンド | 楽天で新品を扱っているかの列を追加する
 バックエンド | 計算の関数を `src/features/treasure/score.ts` に作る
