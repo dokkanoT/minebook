@@ -1,6 +1,6 @@
 # app ディレクトリ仕様
 
-`src/app/` は **URL と画面の入口だけ** を置く場所。部品は `components/`、データ取得・更新は `features/` に置く。
+`src/app/` は **URL と画面** を置く場所。データ取得・更新は `features/`、画面をまたいで使う部品は `components/` に置く。
 
 > Next.js 16 は学習データや古い記事と仕様が違う。迷ったら `node_modules/next/dist/docs/` を読む。
 
@@ -12,16 +12,16 @@ URL | ファイル | 端末 | ログイン | 担当
 `/login` | `(auth)/login/page.tsx` | 両方 | 不要（ログイン済みは振り分け先へ） | 見た目：スマホ / 仕組み：バックエンド
 `/register` | `(auth)/register/page.tsx` | 両方 | 不要（ログイン済みは振り分け先へ） | 見た目：スマホ / 仕組み：バックエンド
 `/dashboard` | `(dashboard)/dashboard/page.tsx` | PC | 必要 | PC
-`/bookshelf` | `(dashboard)/bookshelf/page.tsx` | PC | 必要 | PC
-`/collection` | `(dashboard)/collection/page.tsx` | PC | 必要 | PC
-`/ranking` | `(dashboard)/ranking/page.tsx` | PC | 必要 | PC
-`/history` | `(dashboard)/history/page.tsx` | PC | 必要 | PC
-`/analysis` | `(dashboard)/analysis/page.tsx` | PC | 必要 | PC
+`/dashboard/bookshelf` | `(dashboard)/dashboard/bookshelf/page.tsx` | PC | 必要 | PC
+`/dashboard/collection` | `(dashboard)/dashboard/collection/page.tsx` | PC | 必要 | PC
+`/dashboard/ranking` | `(dashboard)/dashboard/ranking/page.tsx` | PC | 必要 | PC
+`/dashboard/history` | `(dashboard)/dashboard/history/page.tsx` | PC | 必要 | PC
+`/dashboard/analysis` | `(dashboard)/dashboard/analysis/page.tsx` | PC | 必要 | PC
 `/home` | `(mobile)/home/page.tsx` | スマホ | 必要 | スマホ
 `/scan` | `(mobile)/scan/page.tsx` | スマホ | 必要 | スマホ
 `/books/[isbn]` | `books/[isbn]/page.tsx` | 両方 | 不要 | スマホ
 `/auth/confirm` | `auth/confirm/route.ts`（確認メールと Google ログインの戻り先） | – | – | バックエンド
-`/api/*` | `api/**/route.ts` | – | – | バックエンド
+`/api/*` | `api/**/route.ts`（いまはない） | – | – | バックエンド
 
 ### `/` の振り分け（`src/proxy.ts`）
 
@@ -40,7 +40,7 @@ URL | ファイル | 端末 | ログイン | 担当
 
 ### 注意
 
-- 「ログイン必要」のパスは `src/proxy.ts` の `PROTECTED_PATHS` で未ログイン時に `/login` へリダイレクトされる。**ページを追加・URL を変更したら `PROTECTED_PATHS` も更新する**（バックエンドに依頼）
+- 「ログイン必要」のパスは `src/proxy.ts` の `PROTECTED_PATHS` で未ログイン時に `/login` へリダイレクトされる。下の階層も含まれる（`/dashboard` を入れると `/dashboard/bookshelf` も守られる）。**`/dashboard` `/home` `/scan` の外にページを追加・URL を変更したら `PROTECTED_PATHS` も更新する**（バックエンドに依頼）
 - `(auth)` `(dashboard)` `(mobile)` は route group で **URL には出ない**。端末で画面を出し分ける仕組みではないので、PC 向けページもスマホ幅で崩れない程度にはしておく
 - 「両方」のページはレスポンシブな 1 画面にして、担当を 1 人に決める（同じファイルを 2 人で触らない）
 
@@ -54,17 +54,21 @@ URL | ファイル | 端末 | ログイン | 担当
 `error.tsx` | エラー時の表示 | `"use client"` 必須。props は `error` と `retry`
 `not-found.tsx` | 404 表示 | `notFound()` を呼ぶと表示される
 `route.ts` | API エンドポイント | **バックエンドのみ**。画面からの更新は Server Action を使う
+`_components/` | その画面でしか使わない部品 | `_` で始まるフォルダは URL にならない。`(mobile)/_components/`・`(dashboard)/dashboard/_components/`
+`_data/` | その画面でしか使わない型・変換・計算・仮データ | 例：`(mobile)/_data/rank.ts`（お宝度の判定）。仮データ（`mockData.ts` など）は DB につないだら消す
 
-これ以外（部品・フック・型・定数・ユーティリティ）は `app/` に置かない。
+- 画面をまたいで使う部品は `components/` に置く（下記）
+- データの取得・更新（Supabase を呼ぶ処理）は `features/` に置き、`_data/` には置かない
 
 ## page.tsx の書き方
 
 ```tsx
-// (dashboard)/dashboard/collection/page.tsx（例。getMyCollection などはこれから作る）
+// (dashboard)/dashboard/collection/page.tsx（例）
 import { Suspense } from "react";
 
-import { CollectionList } from "@/components/desktop/CollectionList";
 import { getMyCollection } from "@/features/collection/server";
+
+import { CollectionList } from "../_components/collection/CollectionList";
 
 export default function CollectionPage() {
   return (
@@ -96,18 +100,18 @@ async function MyCollection() {
 ## components / features との関係
 
 ```text
-app/（画面の入口）
+app/（画面）
+ ├─ (mobile)/_components/, _data/                    スマホの画面でしか使わない部品・データ（スマホ担当）
+ ├─ (dashboard)/dashboard/_components/, _data/       PC の画面でしか使わない部品・データ（PC 担当）
  ├─ features/<機能>/server.ts, actions.ts, dal.ts   データ取得・更新（バックエンド担当）
- ├─ features/<機能>/components/                     機能に結びついた部品（フォーム等）
+ ├─ features/<機能>/components/                     機能に結びついた部品（ログインフォーム等）
  └─ components/
-     ├─ desktop/   PC 画面にしかない部品
-     ├─ mobile/    スマホ画面にしかない部品
-     ├─ common/    両方で使うアプリ固有の部品
-     └─ ui/        Button・Input など見た目だけの汎用部品
+     ├─ common/    両方で使うアプリ固有の部品（BookCard など）
+     └─ ui/        Panel・Badge など見た目だけの汎用部品
 ```
 
-- `components/` の部品はデータを props で受け取る。Server Action や Supabase を直接呼ばない
-- `desktop/` と `mobile/` はお互いを import しない。両方で必要になったら `common/` に移す
+- 部品はデータを props で受け取る。Supabase を直接呼ばない（`@/lib/supabase/*` を import しない）。更新は Server Action を呼ぶ
+- `(mobile)` と `(dashboard)` の `_components` `_data` はお互いを import しない。両方で必要になったら `components/` に移す
 - 部品は PascalCase の 1 ファイル 1 コンポーネント（`ShelfGrid.tsx`）、named export
 
 ## よく使う import

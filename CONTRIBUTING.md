@@ -4,12 +4,16 @@
 
 - main触らない
 
-- feature/名前
+- feature/部品名
+- fix/修正内容
+- test/テスト内容
 
 
 ## Pull Request
 
 - CI成功必須
+- vercelチェック必須
+- 可能な限り他の人にレビューしてもらう
 
 ## 画面の実装
 
