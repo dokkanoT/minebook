@@ -5,7 +5,7 @@ import { useMemo, useState, type DragEventHandler } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Panel } from "@/components/ui/Panel";
-import { BookTile, type TileBook } from "./BookTile";
+import { BOOK_STATUS, BookTile, type BookStatus, type TileBook } from "./BookTile";
 
 export type PoolBook = TileBook & {
   /** いずれかの棚に置かれているか */
@@ -13,6 +13,9 @@ export type PoolBook = TileBook & {
 };
 
 type PlacementFilter = "all" | "unplaced" | "placed";
+type StatusFilter = "all" | BookStatus | "none";
+
+const STATUS_OPTIONS = Object.entries(BOOK_STATUS) as [BookStatus, { label: string }][];
 
 type BookPoolProps = {
   books: PoolBook[];
@@ -37,6 +40,7 @@ export function BookPool({
   const [placement, setPlacement] = useState<PlacementFilter>("unplaced");
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState("all");
+  const [status, setStatus] = useState<StatusFilter>("all");
 
   const counts = useMemo(
     () => ({
@@ -53,9 +57,10 @@ export function BookPool({
       (b) =>
         (placement === "all" || (placement === "placed" ? b.placed : !b.placed)) &&
         (category === "all" || b.category === category) &&
+        (status === "all" || (status === "none" ? !b.status : b.status === status)) &&
         (q === "" || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q)),
     );
-  }, [books, placement, keyword, category]);
+  }, [books, placement, keyword, category, status]);
 
   const tabs: { value: PlacementFilter; label: string }[] = [
     { value: "all", label: "すべて" },
@@ -104,8 +109,8 @@ export function BookPool({
         })}
       </div>
 
-      <div className="mt-4 grid gap-2 md:grid-cols-[minmax(0,1fr)_12rem]">
-        <label className="relative block">
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        <label className="relative block sm:col-span-2">
           <span className="sr-only">タイトル・著者で検索</span>
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" aria-hidden />
           <input
@@ -130,6 +135,22 @@ export function BookPool({
                 {c}
               </option>
             ))}
+          </select>
+        </label>
+        <label className="relative block">
+          <span className="sr-only">ステータスで絞り込む</span>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value as StatusFilter)}
+            className={`${FIELD_CLASS} w-full`}
+          >
+            <option value="all">ステータス：すべて</option>
+            {STATUS_OPTIONS.map(([value, { label }]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+            <option value="none">未選択</option>
           </select>
         </label>
       </div>

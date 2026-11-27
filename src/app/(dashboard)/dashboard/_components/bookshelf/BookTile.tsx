@@ -7,8 +7,31 @@ export type TileBook = {
   title: string;
   author: string;
   category: string;
-  score: number;
+  /** お宝度。まだ計算していない本は null */
+  score: number | null;
+  /** 購入・保留・見送り。未選択は null */
+  status?: BookStatus | null;
 };
+
+export type BookStatus = "purchased" | "pending" | "skip";
+
+/** ステータスの表示名と色（スマホのホームのバッジと揃える） */
+export const BOOK_STATUS: Record<BookStatus, { label: string; className: string }> = {
+  purchased: { label: "購入済", className: "border-emerald-300 bg-emerald-100 text-emerald-800" },
+  pending: { label: "保留中", className: "border-amber-300 bg-amber-100 text-amber-800" },
+  skip: { label: "見送り", className: "border-neutral-300 bg-neutral-100 text-neutral-600" },
+};
+
+function StatusBadge({ status }: { status: BookStatus }) {
+  const { label, className } = BOOK_STATUS[status];
+  return (
+    <span className={`inline-block whitespace-nowrap rounded-sm border px-2 py-0.5 text-[11px] font-bold ${className}`}>
+      {label}
+    </span>
+  );
+}
+
+const formatScore = (score: number | null) => (score === null ? "—" : String(score));
 
 /** default: 通常 / dragging: ドラッグ中 / selected: 選択中 */
 export type TileState = "default" | "dragging" | "selected";
@@ -60,7 +83,8 @@ export function BookTile({
     return (
       <article
         {...dragProps}
-        aria-label={`${book.title}、${book.author}、${book.category}、お宝度${book.score}`}
+        aria-label={`${book.title}、${book.author}、${book.category}、お宝度${formatScore(book.score)}${book.status ? `、${BOOK_STATUS[book.status].label}` : ""}`}
+        title={book.status ? `${book.title}（${BOOK_STATUS[book.status].label}）` : book.title}
         className={`relative flex h-36 w-12 shrink-0 flex-col items-center justify-between rounded-t-sm border px-1.5 py-2 shadow-sm transition-transform ${
           state === "dragging" ? "-rotate-2 border-2 border-neutral-900" : "border-neutral-400"
         } bg-neutral-700 text-white transition-all hover:-translate-y-1 hover:shadow-md ${handle ? "cursor-grab select-none" : ""}`}
@@ -69,7 +93,7 @@ export function BookTile({
         <h3 className="max-h-24 overflow-hidden text-[11px] font-bold leading-tight" style={{ writingMode: "vertical-rl" }}>
           {book.title}
         </h3>
-        <span className="text-[10px] font-bold text-neutral-200">{book.score}</span>
+        <span className="text-[10px] font-bold text-neutral-200">{formatScore(book.score)}</span>
       </article>
     );
   }
@@ -94,9 +118,14 @@ export function BookTile({
       <p className="mt-0.5 truncate text-[11px] text-neutral-600">{book.author}</p>
       <p className="mt-0.5 flex items-center justify-between gap-1 text-[11px] text-neutral-600">
         <span className="truncate">{book.category}</span>
-        <span className="shrink-0 font-bold text-neutral-900">お宝度 {book.score}</span>
+        <span className="shrink-0 font-bold text-neutral-900">お宝度 {formatScore(book.score)}</span>
       </p>
-      {badge && <div className="mt-2">{badge}</div>}
+      {(badge || book.status) && (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {book.status && <StatusBadge status={book.status} />}
+          {badge}
+        </div>
+      )}
     </article>
   );
 }

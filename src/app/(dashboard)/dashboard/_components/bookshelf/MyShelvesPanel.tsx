@@ -11,6 +11,10 @@ type MyShelvesPanelProps = {
   onDropBook?: (shelfId: string, bookId: string) => void;
   onDragStart?: DragEventHandler<HTMLElement>;
   onDragEnd?: DragEventHandler<HTMLElement>;
+  onCreateShelf?: () => void;
+  onDeleteShelf?: (shelfId: string) => void;
+  /** 保存中はボタンを押せなくする */
+  busy?: boolean;
 };
 
 export function MyShelvesPanel({
@@ -18,6 +22,9 @@ export function MyShelvesPanel({
   onDropBook,
   onDragStart,
   onDragEnd,
+  onCreateShelf,
+  onDeleteShelf,
+  busy = false,
 }: MyShelvesPanelProps) {
   const [activeShelfId, setActiveShelfId] = useState<string | null>(null);
 
@@ -26,7 +33,12 @@ export function MyShelvesPanel({
       title="マイ本棚"
       description="本を置きたい棚へドラッグしてください"
       action={
-        <OutlineButton size="sm" className="gap-1.5">
+        <OutlineButton
+          size="sm"
+          className="gap-1.5"
+          onClick={onCreateShelf}
+          disabled={busy || !onCreateShelf}
+        >
           <Plus className="h-3.5 w-3.5" aria-hidden />
           棚を作成
         </OutlineButton>
@@ -38,6 +50,12 @@ export function MyShelvesPanel({
         <span>棚の中の背表紙もドラッグして移動できます</span>
       </div>
       <div className="space-y-4">
+        {shelves.length === 0 && (
+          <DropSlot
+            title="まだ本棚がありません"
+            description="「棚を作成」から、最初の本棚を作ってください"
+          />
+        )}
         {shelves.map((shelf) => {
           const empty = shelf.books.length === 0;
           return (
@@ -45,7 +63,17 @@ export function MyShelvesPanel({
               key={shelf.id}
               shelf={shelf}
               highlight={activeShelfId === shelf.id}
-              aside={empty ? <OutlineButton size="sm">削除</OutlineButton> : undefined}
+              aside={
+                empty ? (
+                  <OutlineButton
+                    size="sm"
+                    onClick={() => onDeleteShelf?.(shelf.id)}
+                    disabled={busy || !onDeleteShelf}
+                  >
+                    削除
+                  </OutlineButton>
+                ) : undefined
+              }
               onDragStart={onDragStart}
               onDragEnd={onDragEnd}
               onDragOver={(event) => {
