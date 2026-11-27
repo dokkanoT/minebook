@@ -41,6 +41,8 @@ export type BookshelfItem = {
   shelfId: string | null;
   // 配置済みの棚の名前（未配置は null）
   shelfName: string | null;
+  // 購入・保留・見送り（purchased / pending / skip）。未選択は null
+  status: string | null;
   scannedAt: string;
 };
 
@@ -73,7 +75,7 @@ export async function getMyBookshelf(): Promise<Bookshelf> {
     supabase
       .from("collection_items")
       .select(
-        "id, isbn, shelf_id, shelf_position, treasure_score, scanned_at, book:books!inner(title, author, category)",
+        "id, isbn, shelf_id, shelf_position, treasure_score, status, scanned_at, book:books!inner(title, author, category)",
       )
       .eq("user_id", user.id)
       .order("scanned_at", { ascending: false }),
@@ -93,6 +95,7 @@ export async function getMyBookshelf(): Promise<Bookshelf> {
       treasureScore: row.treasure_score,
       shelfId: row.shelf_id,
       shelfName: row.shelf_id ? (shelfNames.get(row.shelf_id) ?? null) : null,
+      status: row.status,
       scannedAt: row.scanned_at,
     } satisfies BookshelfItem,
   }));

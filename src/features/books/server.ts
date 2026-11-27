@@ -90,3 +90,16 @@ async function fetchBookData(isbn13: string) {
     reviewCount: r ? r.reviewCount : null,
   };
 }
+
+export type Category = Pick<Tables<"categories">, "slug" | "name">;
+
+// カテゴリーの一覧（表示順）。絞り込みや slug → 表示名の変換に使う
+export async function getCategories(): Promise<Category[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("categories")
+    .select("slug, name")
+    .order("sort_order");
+  if (error) throw error;
+  return data;
+}
