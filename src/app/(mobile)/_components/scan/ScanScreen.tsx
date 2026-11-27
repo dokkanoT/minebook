@@ -1,14 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { BookCover } from '../book/BookCover';
 import { DEFAULT_SCANNED_LIST } from '../../_data/mockData';
 import type { ScannedItem } from '../../_data/types';
 import { CameraPreview } from './CameraPreview';
+import { ScanDeleteDialog } from './ScanDeleteDialog';
+import { isNextRedirectError } from '@/lib/utils/next-errors';
 
 export type { ScannedItem };
 export { DEFAULT_SCANNED_LIST };
+
+export type DeleteScannedItemResult =
+  | { ok: true }
+  | { ok: false; error: string }
+  | boolean
+  | void;
 
 export interface ScanScreenProps {
   onBack?: () => void;
@@ -16,6 +24,10 @@ export interface ScanScreenProps {
   scannedList?: ScannedItem[];
   onScannedListChange?: (list: ScannedItem[]) => void;
   onSearchIsbn?: (isbn: string) => Promise<boolean | void> | boolean | void;
+  onDeleteItem?: (
+    item: ScannedItem,
+  ) => Promise<DeleteScannedItemResult> | DeleteScannedItemResult;
+  isItemSaved?: (item: ScannedItem) => boolean;
   isSearching?: boolean;
   searchError?: string | null;
 }
@@ -24,11 +36,18 @@ export const ScanScreen = ({
   onOpenEvaluation,
   scannedList: externalScannedList,
   onSearchIsbn,
+  onDeleteItem,
+  isItemSaved,
   isSearching = false,
   searchError,
 }: ScanScreenProps) => {
   const [isbnInput, setIsbnInput] = useState('');
-  const [internalList] = useState<ScannedItem[]>(DEFAULT_SCANNED_LIST);
+  const [internalList, setInternalList] =
+    useState<ScannedItem[]>(DEFAULT_SCANNED_LIST);
+  const [pendingDeleteItem, setPendingDeleteItem] =
+    useState<ScannedItem | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const handleIsbnSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,8 +71,53 @@ export const ScanScreen = ({
     void onSearchIsbn?.(isbn);
   };
 
+  const handleOpenDeleteDialog = (item: ScannedItem) => {
+    setDeleteError(null);
+    setPendingDeleteItem(item);
+  };
+
+  const handleCancelDelete = () => {
+    if (isDeleting) return;
+    setDeleteError(null);
+    setPendingDeleteItem(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDeleteItem || isDeleting) return;
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    try {
+      if (onDeleteItem) {
+        const result = await onDeleteItem(pendingDeleteItem);
+        if (result === false) {
+          setDeleteError('削除に失敗しました。再度お試しください。');
+          return;
+        }
+        if (typeof result === 'object' && result !== null && !result.ok) {
+          setDeleteError(result.error);
+          return;
+        }
+      } else {
+        setInternalList((prev) =>
+          prev.filter((b) => b.id !== pendingDeleteItem.id),
+        );
+      }
+
+      setPendingDeleteItem(null);
+    } catch (err) {
+      // ログイン切れなどの転送はエラー表示にせず、そのまま Next.js に任せる
+      if (isNextRedirectError(err)) throw err;
+      setDeleteError(
+        err instanceof Error ? err.message : '削除中にエラーが発生しました。',
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
-    <div className="w-full flex-1 flex flex-col justify-between bg-white text-gray-900 min-h-0">
+    <div className="w-full flex-1 flex flex-col justify-between bg-white text-gray-900 min-h-0 relative">
       {/* ★ 確実にアニメーションを効かせるためのスタイル定義 */}
       <style>{`
         @keyframes slideInFromTopCustom {
@@ -175,57 +239,75 @@ export const ScanScreen = ({
 
             {/* スクロール可能なリスト */}
             <div className="space-y-2 overflow-y-auto max-h-[220px] pr-0.5">
-              {scannedList.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => onOpenEvaluation && onOpenEvaluation(item)}
-                  className={`w-full text-left border rounded-lg p-2.5 transition-all flex items-center gap-3 shadow-xs cursor-pointer active:scale-[0.99] touch-manipulation ${
-                    item.isNew
-                      ? 'slide-down-active bg-amber-50 border-amber-300 ring-2 ring-amber-300/50'
-                      : 'bg-gray-50/50 border-gray-300 hover:bg-gray-100/60'
-                  }`}
-                >
-                  <BookCover
-                    coverUrl={item.coverUrl}
-                    title={item.title}
-                    size="sm"
-                    highlighted={item.isNew}
-                  />
+              {scannedList.length === 0 ? (
+                <p className="text-xs text-gray-400 text-center py-6 border border-dashed border-gray-200 rounded-lg">
+                  まだスキャンされた本はありません
+                </p>
+              ) : (
+                scannedList.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`w-full border rounded-lg p-2.5 transition-all flex items-center gap-2 shadow-xs ${
+                      item.isNew
+                        ? 'slide-down-active bg-amber-50 border-amber-300 ring-2 ring-amber-300/50'
+                        : 'bg-gray-50/50 border-gray-300 hover:bg-gray-100/60'
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => onOpenEvaluation && onOpenEvaluation(item)}
+                      className="flex-1 min-w-0 text-left flex items-center gap-3 cursor-pointer active:opacity-75 touch-manipulation"
+                    >
+                      <BookCover
+                        coverUrl={item.coverUrl}
+                        title={item.title}
+                        size="sm"
+                        highlighted={item.isNew}
+                      />
 
-                  {/* 書籍タイトルとステータス */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <h4 className="font-bold text-xs text-gray-900 truncate">
-                        {item.title}
-                      </h4>
-                      {item.isNew && (
-                        <span className="text-[9px] font-black text-amber-700 bg-amber-200 px-1 py-0.5 rounded shrink-0">
-                          NEW
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[10px] text-gray-500 mt-0.5 truncate flex items-center gap-1">
-                      {item.isEvaluated ? (
-                        <>
-                          <CheckCircle2 className="w-3 h-3 text-emerald-600 inline shrink-0" />
-                          <span className="text-emerald-700 font-medium truncate">
-                            {item.statusText}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <AlertCircle className="w-3 h-3 text-amber-600 inline shrink-0" />
-                          <span className="truncate">{item.statusText}</span>
-                        </>
-                      )}
-                    </p>
+                      {/* 書籍タイトルとステータス */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="font-bold text-xs text-gray-900 truncate">
+                            {item.title}
+                          </h4>
+                          {item.isNew && (
+                            <span className="text-[9px] font-black text-amber-700 bg-amber-200 px-1 py-0.5 rounded shrink-0">
+                              NEW
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-gray-500 mt-0.5 truncate flex items-center gap-1">
+                          {item.isEvaluated ? (
+                            <>
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600 inline shrink-0" />
+                              <span className="text-emerald-700 font-medium truncate">
+                                {item.statusText}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <AlertCircle className="w-3 h-3 text-amber-600 inline shrink-0" />
+                              <span className="truncate">{item.statusText}</span>
+                            </>
+                          )}
+                        </p>
+                      </div>
+                    </button>
+
+                    {/* 右端の削除ボタン */}
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDeleteDialog(item)}
+                      aria-label={`${item.title}を削除`}
+                      title="履歴から削除"
+                      className="p-2 -mr-1 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 active:scale-90 transition-colors shrink-0 cursor-pointer touch-manipulation"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
-
-                  {/* 矢印 */}
-                  <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
-                </button>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -247,6 +329,15 @@ export const ScanScreen = ({
           未評価の本を確認（{unevaluatedCount}冊）
         </button>
       </div>
+
+      <ScanDeleteDialog
+        item={pendingDeleteItem}
+        isSaved={pendingDeleteItem ? isItemSaved?.(pendingDeleteItem) : false}
+        isDeleting={isDeleting}
+        error={deleteError}
+        onCancel={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };
