@@ -3,7 +3,13 @@
 import React, { useRef, useState } from 'react';
 import { ScanScreen } from './ScanScreen';
 import { lookupBook } from '@/features/books/actions';
-import { addToCollection, updateCollectionItem } from '@/features/collection/actions';
+import {
+  addToCollection,
+  removeFromCollection,
+  updateCollectionItem,
+} from '@/features/collection/actions';
+import { COLLECTION_ITEM_NOT_FOUND } from '@/features/collection/messages';
+import { isNextRedirectError } from '@/lib/utils/next-errors';
 import { BookBottomSheet } from '../book/BookBottomSheet';
 import { INITIAL_BOOKS } from '../../_data/mockData';
 import { evaluateBookPrice } from '../../_data/bookEvaluation';
@@ -11,16 +17,6 @@ import type { BookItem, FlagType, ScannedItem, SheetState } from '../../_data/ty
 
 interface ScanWorkspaceProps {
   initialScannedList: ScannedItem[];
-}
-
-function isNextRedirectError(err: unknown): boolean {
-  return (
-    typeof err === 'object' &&
-    err !== null &&
-    'digest' in err &&
-    typeof err.digest === 'string' &&
-    err.digest.startsWith('NEXT_REDIRECT')
-  );
 }
 
 /**
@@ -258,13 +254,64 @@ export function ScanWorkspace({ initialScannedList }: ScanWorkspaceProps) {
     enqueueBookSync(updatedBook, { status: flag });
   };
 
+  const handleDeleteItem = async (
+    item: ScannedItem,
+  ): Promise<{ ok: true } | { ok: false; error: string }> => {
+    // 進行中の登録・更新が完了してから collectionItemId を判定し、DBとの不整合を防ぐ
+    const inFlightSync = syncQueueRef.current[item.id];
+    if (inFlightSync) {
+      try {
+        await inFlightSync;
+      } catch (err) {
+        if (isNextRedirectError(err)) throw err;
+      }
+    }
+
+    const targetBook = booksById[item.id];
+    const collectionItemId =
+      collectionIdRef.current[item.id] ?? targetBook?.collectionItemId;
+
+    if (!item.isMock && collectionItemId) {
+      try {
+        const res = await removeFromCollection({ id: collectionItemId });
+        // 別の画面・端末ですでに削除済みなら、目的は達成済みとしてリストからも消す
+        if (!res.ok && res.error !== COLLECTION_ITEM_NOT_FOUND) {
+          return { ok: false, error: res.error };
+        }
+        delete collectionIdRef.current[item.id];
+      } catch (err) {
+        if (isNextRedirectError(err)) throw err;
+        return { ok: false, error: '削除中にエラーが発生しました。' };
+      }
+    }
+
+    delete syncQueueRef.current[item.id];
+    setScannedList((prev) => prev.filter((b) => b.id !== item.id));
+    setBooksById((prev) => {
+      if (!(item.id in prev)) return prev;
+      const next = { ...prev };
+      delete next[item.id];
+      return next;
+    });
+
+    if (selectedBook?.id === item.id) {
+      setSelectedBook(null);
+      setSheetState('closed');
+    }
+
+    return { ok: true };
+  };
+
   return (
     <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
       <ScanScreen
         scannedList={scannedList}
-        onScannedListChange={setScannedList}
         onOpenEvaluation={handleOpenEvaluation}
         onSearchIsbn={handleSearchIsbn}
+        onDeleteItem={handleDeleteItem}
+        isItemSaved={(item) =>
+          Boolean(!item.isMock && booksById[item.id]?.collectionItemId)
+        }
         isSearching={isSearching}
         searchError={searchError}
       />

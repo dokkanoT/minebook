@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { requireUser } from "@/features/auth/dal";
 import { getOrCreateBook } from "@/features/books/server";
+import { COLLECTION_ITEM_NOT_FOUND } from "@/features/collection/messages";
 import { createClient } from "@/lib/supabase/server";
 import {
   dbFailure,
@@ -81,7 +82,7 @@ export async function updateCollectionItem(
     .eq("id", id)
     .select("id");
   if (error) return dbFailure(error);
-  if (data.length === 0) return failure("本が見つかりません");
+  if (data.length === 0) return failure(COLLECTION_ITEM_NOT_FOUND);
 
   refresh();
   return success(null);
@@ -103,7 +104,7 @@ export async function removeFromCollection(
     .eq("id", parsed.data.id)
     .select("id");
   if (error) return dbFailure(error);
-  if (data.length === 0) return failure("本が見つかりません");
+  if (data.length === 0) return failure(COLLECTION_ITEM_NOT_FOUND);
 
   refresh();
   return success(null);
