@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
+import { getMyCollection } from '@/features/collection/server';
 import { HomeWorkspace } from '../_components/home/HomeWorkspace';
-import { INITIAL_BOOKS } from '../_data/mockData';
+import { toBookItem } from '../_data/fromCollection';
 
 export default function MobileHomePage() {
   return (
@@ -11,7 +12,13 @@ export default function MobileHomePage() {
         </div>
       }
     >
-      <HomeWorkspace initialBooks={INITIAL_BOOKS} />
+      <MyBooks />
     </Suspense>
   );
+}
+
+// ログインユーザーの保存済みの本（スキャンが新しい順）
+async function MyBooks() {
+  const items = await getMyCollection();
+  return <HomeWorkspace initialBooks={items.map(toBookItem)} />;
 }
