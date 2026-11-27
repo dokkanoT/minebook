@@ -68,7 +68,7 @@ export function HomeWorkspace({ initialBooks }: HomeWorkspaceProps) {
   const handleExecuteEvaluation = (price: number) => {
     if (!selectedBook) return;
 
-    const { rank } = evaluateBookPrice(selectedBook.originalPrice, price);
+    const { rank } = evaluateBookPrice(selectedBook, price);
 
     const updatedBook: BookItem = {
       ...selectedBook,

@@ -1,5 +1,6 @@
 import type { CollectionItem } from '@/features/collection/server';
-import { calcRank } from './rank';
+import { evaluateBookPrice } from './bookEvaluation';
+import { toPublishedFields } from './published';
 import type { BookItem, FlagType } from './types';
 
 const FLAGS: readonly FlagType[] = ['purchased', 'pending', 'skip'];
@@ -16,8 +17,11 @@ const scanDateFormat = new Intl.DateTimeFormat('ja-JP', {
 export function toBookItem(item: CollectionItem): BookItem {
   const { book } = item;
   const originalPrice = book.list_price ?? 0;
-  // 店頭価格が入っていれば判定済み。ランクは保存せず、毎回 calcRank で出す
+  // 店頭価格が入っていれば判定済み。お宝度は保存せず、毎回計算する
   const isEvaluated = item.store_price !== null;
+  const published = toPublishedFields(book.published_date);
+  const reviewRating = book.review_average ?? undefined;
+  const reviewCount = book.review_count ?? undefined;
 
   return {
     id: item.id,
@@ -33,15 +37,18 @@ export function toBookItem(item: CollectionItem): BookItem {
     isEvaluated,
     rank:
       item.store_price !== null
-        ? calcRank(originalPrice, item.store_price)
+        ? evaluateBookPrice(
+            { originalPrice, reviewRating, reviewCount, releaseDate: published.releaseDate },
+            item.store_price,
+          ).rank
         : undefined,
     storeName: item.store_name ?? '未登録',
     isbn: item.isbn,
-    publishedYear: '',
+    ...published,
     publisher: book.publisher ?? '情報なし',
     description: book.description ?? 'あらすじ情報はありません。',
-    reviewRating: book.review_average ?? undefined,
-    reviewCount: book.review_count ?? undefined,
+    reviewRating,
+    reviewCount,
     reviewSource: '楽天ブックス',
     flag: FLAGS.find((flag) => flag === item.status) ?? 'none',
   };

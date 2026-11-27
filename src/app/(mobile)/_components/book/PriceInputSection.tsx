@@ -2,10 +2,15 @@
 
 import React from 'react';
 import { PenLine, Sparkles } from 'lucide-react';
-import { evaluateBookPrice, RANK_BADGE_BG } from '../../_data/bookEvaluation';
+import {
+  evaluateBookPrice,
+  RANK_BADGE_BG,
+  type TreasureSource,
+} from '../../_data/bookEvaluation';
 
 interface PriceInputSectionProps {
-  originalPrice: number;
+  /** お宝度の計算に使う本の情報 */
+  book: TreasureSource;
   value: string;
   onChange: (value: string) => void;
   onCancel: () => void;
@@ -13,12 +18,13 @@ interface PriceInputSectionProps {
 }
 
 export function PriceInputSection({
-  originalPrice,
+  book,
   value,
   onChange,
   onCancel,
   onEvaluate,
 }: PriceInputSectionProps) {
+  const { originalPrice } = book;
   const numericVal = parseInt(value, 10);
   const isValid = !Number.isNaN(numericVal) && numericVal >= 0;
 
@@ -39,7 +45,7 @@ export function PriceInputSection({
   ];
 
   const preview = isValid
-    ? evaluateBookPrice(originalPrice, numericVal)
+    ? evaluateBookPrice(book, numericVal)
     : null;
 
   return (

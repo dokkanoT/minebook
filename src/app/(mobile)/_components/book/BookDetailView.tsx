@@ -80,7 +80,7 @@ export const BookDetailView = ({
 
   // お宝度判定の実行
   const handleExecuteEvaluation = (price: number) => {
-    const { rank } = evaluateBookPrice(currentBook.originalPrice, price);
+    const { rank } = evaluateBookPrice(currentBook, price);
 
     const updated: BookItem = {
       ...currentBook,
@@ -110,7 +110,7 @@ export const BookDetailView = ({
     if (onSave) onSave(updated);
   };
 
-  const evaluation = evaluateBookPrice(currentBook.originalPrice, currentBook.shopPrice);
+  const evaluation = evaluateBookPrice(currentBook, currentBook.shopPrice);
   const activeRank = currentBook.rank ?? evaluation.rank;
 
   return (
@@ -278,7 +278,7 @@ export const BookDetailView = ({
       <div className="px-5 pt-2.5 pb-4 bg-white border-t border-gray-100 shrink-0">
         {isInputtingPrice ? (
           <PriceInputSection
-            originalPrice={currentBook.originalPrice}
+            book={currentBook}
             value={priceInputValue}
             onChange={setPriceInputValue}
             onCancel={() => setIsInputtingPrice(false)}

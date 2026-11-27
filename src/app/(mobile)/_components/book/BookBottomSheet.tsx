@@ -122,7 +122,7 @@ export function BookBottomSheet({
   };
 
   const evaluation = selectedBook
-    ? evaluateBookPrice(selectedBook.originalPrice, selectedBook.shopPrice)
+    ? evaluateBookPrice(selectedBook, selectedBook.shopPrice)
     : null;
   const activeRank = selectedBook?.rank ?? evaluation?.rank ?? 'B';
 
@@ -374,7 +374,7 @@ export function BookBottomSheet({
 
               {isInputtingPrice ? (
                 <PriceInputSection
-                  originalPrice={selectedBook.originalPrice}
+                  book={selectedBook}
                   value={priceInputValue}
                   onChange={setPriceInputValue}
                   onCancel={() => setIsInputtingPrice(false)}

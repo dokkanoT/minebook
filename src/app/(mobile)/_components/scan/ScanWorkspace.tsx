@@ -13,6 +13,7 @@ import { isNextRedirectError } from '@/lib/utils/next-errors';
 import { BookBottomSheet } from '../book/BookBottomSheet';
 import { INITIAL_BOOKS } from '../../_data/mockData';
 import { evaluateBookPrice } from '../../_data/bookEvaluation';
+import { toPublishedFields } from '../../_data/published';
 import type { BookItem, FlagType, ScannedItem, SheetState } from '../../_data/types';
 
 interface ScanWorkspaceProps {
@@ -69,7 +70,7 @@ export function ScanWorkspace({ initialScannedList }: ScanWorkspaceProps) {
         shopPrice: 0,
         storeName: '古本屋',
         isbn: dbBook.isbn,
-        publishedYear: '',
+        ...toPublishedFields(dbBook.published_date),
         publisher: dbBook.publisher ?? '情報なし',
         description: dbBook.description ?? 'あらすじ情報はありません。',
         // レビューがない本は ReviewCard が表示されない
@@ -212,7 +213,7 @@ export function ScanWorkspace({ initialScannedList }: ScanWorkspaceProps) {
   const handleExecuteEvaluation = (price: number) => {
     if (!selectedBook) return;
 
-    const { rank } = evaluateBookPrice(selectedBook.originalPrice, price);
+    const { rank } = evaluateBookPrice(selectedBook, price);
     const updatedBook: BookItem = {
       ...selectedBook,
       collectionItemId:
